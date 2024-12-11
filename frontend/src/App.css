@@ -1,0 +1,184 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body, html {
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .app {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    color: white;
+    overflow: hidden;
+  }
+  
+  h1 {
+    margin-bottom: 20px;
+  }
+  
+  .input-form {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    animation: fadeIn 2s ease-in-out forwards; /* Apply the animation */
+  }
+
+  .secondinput-form {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .input-field {
+    padding: 10px;
+    font-size: 22px;
+    width: 500px;
+    height: 60px;
+    margin-right: -35px;
+    border-radius: 30px;
+    background-color: black;
+    border: 1px solid #ccc;
+    color: ghostwhite;
+    text-indent: 15px;
+    animation: fadeIn 2s ease-in-out forwards; /* Apply the animation */
+  }
+
+  .secondinput-field {
+    margin-top: -95vh;
+    padding: 10px;
+    font-size: 15px;
+    width: 500px;
+    height: 40px;
+    margin-right: -35px;
+    border-radius: 30px;
+    background-color: black;
+    border: 1px solid #ccc;
+    color: ghostwhite;
+    text-indent: 15px;
+  }
+  
+  .submit-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    background-color: seagreen;
+    color: white;
+    transition: background-color 0.3s ease;
+    animation: fadeIn 2s ease-in-out forwards; /* Apply the animation */
+  }
+
+  .secondsubmit-button {
+    margin-top: -95vh;
+    height: 40px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    background-color: seagreen;
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-button:disabled {
+    background-color: #ccc;
+  }
+  
+  .submit-button:hover:not(:disabled) {
+    background-color: #ff6347;
+  }
+
+  .expandable-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 120px; /* Initial width of the button */
+    height: 50px;
+    border-radius: 20px;
+    border-color: white;
+    transition: width 0.5s ease, border-radius 0.4s ease;
+    overflow: hidden;
+  }
+  
+  .expandable-button.expanded {
+    margin-top: 10px;
+    color: white;
+    width: 100vw; /* Expanded width */
+    height: 100vh;
+  }
+  
+  .expand-button {
+    margin-top: 10px;
+    border-radius: 10px;
+    background-color: black;
+    border: solid white 0.5px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 10px 20px;
+  }
+
+  .secondexpand-button {
+    margin-top: -95vh;
+    background: none;
+    border-radius: 10px;
+    background-color: black;
+    border: solid white 0.5px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 10px 20px;
+  }
+  
+  .error-message {
+    color: red;
+    margin-top: 20px;
+  }
+  
+  .background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .info-text {
+    font-size: 24px;
+    font-weight: bold;
+    z-index: 10;
+  }
+  
+  .fade-in-element {
+    opacity: 0;
+    animation: fadeIn 1s ease-in-out forwards; /* Apply the animation */
+    margin: 10px 0;
+    font-size: 20px;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0; /* Start with opacity 0 (invisible) */
+    }
+    to {
+      opacity: 1; /* End with opacity 1 (fully visible) */
+    }
+  }

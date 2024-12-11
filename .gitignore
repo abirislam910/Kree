@@ -1,7 +1,20 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# Node.js backend
+backend/node_modules/
+backend/.env
+backend/Procfile
+
+# React frontend
+frontend/node_modules/
+frontend/build/
+frontend/.env
+frontend/.vercel
+frontend/.gitignore
+
 # dependencies
 /node_modules
+/.vercel
 /.pnp
 .pnp.js
 
@@ -10,6 +23,7 @@
 
 # production
 /build
+/private
 
 # misc
 .DS_Store
@@ -17,7 +31,9 @@
 .env.development.local
 .env.test.local
 .env.production.local
+.env
 
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.vercel
