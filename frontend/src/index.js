@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import ReactDOM from "react-dom/client";
-import OpenAI from "openai";
 import axios from 'axios';
 import './App.css';
 
@@ -11,10 +10,6 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
-
-  //const val = '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';
-
-  //const openai = new OpenAI({dangerouslyAllowBrowser: true, apiKey: key});
 
   const handleInputChange = (e) => {
     setLocation(e.target.value);
