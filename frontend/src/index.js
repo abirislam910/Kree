@@ -20,6 +20,7 @@ const App = () => {
     setError('');
 
     if (!location.trim()) {
+      setLoading(false);
       return;
     }
     setLoading(true);
@@ -75,7 +76,7 @@ const App = () => {
           className="background-image"
           style={{
             backgroundImage: `url(${imageUrl})`,
-            backgroundSize: 'contain',
+            backgroundSize: 'cover',
             backgroundPosition: 'center',
             height: '100vh',
             width: '100%',
@@ -95,6 +96,42 @@ const App = () => {
                     />
                     <button type="submit" className="secondsubmit-button" disabled={loading}>
                     {loading ? 'Generating...' : 'Generate Image'}
+                    </button>                    </>
+                ) : (
+                    <button type="button" onClick={handleButtonClick} className="expand-button">
+                    Search
+                    </button>
+                )}
+                </div>
+            </form>
+        </div>
+      )}
+
+    {imageUrl && error && (
+        <div
+          className="background-image"
+          style={{
+            backgroundImage: `url(${imageUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            height: '100vh',
+            width: '100vw',
+          }}
+        >
+            <form className="secondinput-form" onSubmit={handleSubmit}>
+                <div className={`expandable-button ${isExpanded ? 'expanded' : ''}`}>
+                {isExpanded ? (
+                    <>
+                    <button type="button" className='secondexpand-button' onClick={handleButtonClick}>X</button>
+                    <input
+                        type="text"
+                        value={location}
+                        onChange={handleInputChange}
+                        placeholder="Describe a location..."
+                        className="secondinput-field"
+                    />
+                    <button type="submit" className="failedsubmit-button" disabled={loading}>
+                    {loading ? 'Generating...' : 'Failed to Fetch Image. Try Again!'}
                     </button>                    </>
                 ) : (
                     <button type="button" onClick={handleButtonClick} className="expand-button">

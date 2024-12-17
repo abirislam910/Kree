@@ -38,10 +38,11 @@
   .input-field {
     padding: 10px;
     font-size: 22px;
-    width: 500px;
-    height: 60px;
-    margin-right: -35px;
-    border-radius: 30px;
+    width: 50vw;
+    height: 8vh;
+    margin-right: -1px;
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
     background-color: black;
     border: 1px solid #ccc;
     color: ghostwhite;
@@ -74,6 +75,14 @@
     animation: fadeIn 2s ease-in-out forwards; /* Apply the animation */
   }
 
+  .submit-button:disabled {
+    background-color: #ccc;
+  }
+  
+  .submit-button:hover:not(:disabled) {
+    background-color: mediumseagreen;
+  }
+
   .secondsubmit-button {
     margin-top: -95vh;
     height: 40px;
@@ -85,13 +94,33 @@
     color: white;
     transition: background-color 0.3s ease;
   }
-  
-  .submit-button:disabled {
+
+  .secondsubmit-button:disabled {
     background-color: #ccc;
   }
   
-  .submit-button:hover:not(:disabled) {
-    background-color: #ff6347;
+  .secondsubmit-button:hover:not(:disabled) {
+    background-color: mediumseagreen;
+  }
+
+  .failedsubmit-button {
+    margin-top: -95vh;
+    height: 40px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    background-color: crimson;
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+
+  .failedsubmit-button:disabled {
+    background-color: #ccc;
+  }
+  
+  .failedsubmit-button:hover:not(:disabled) {
+    background-color: red;
   }
 
   .expandable-button {
