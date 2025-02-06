@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import ReactDOM from "react-dom/client";
 import axios from 'axios';
 import './App.css';
@@ -48,6 +48,34 @@ const App = () => {
     }
     setLoading(false);
   };
+
+  const fetchMusic = async () => {
+    setLoading(true);
+    setError('');
+
+    if (!location.trim()) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      const fullPrompt = "" + location + ""
+      //figure out prompt
+
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/generate-music`, {
+        prompt: fullPrompt,
+      });
+
+      //setImageData(response.data.imageData);
+      //figure out how to handle response
+    }
+    catch (err) {
+      setError('Failed to generate music. Please try again.');
+      console.log(err);
+    }
+    setLoading(false);
+  };
   
   const handleButtonClick = () => {
     setIsExpanded(!isExpanded);
@@ -56,6 +84,18 @@ const App = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     fetchImage();
+  };
+
+  const handleDownload = () => {
+    if (!imageData) return;
+
+    const link = document.createElement('a');
+    link.href = `data:image/png;base64,${imageData}`;
+    link.download = 'generated-image.png';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -69,6 +109,9 @@ const App = () => {
           onChange={handleInputChange}
           placeholder="Describe a location..."
           className="input-field"
+          style={{
+            minHeight: '40px',
+          }}
         />
         <button type="submit" className="submit-button" disabled={loading}>
           {loading ? 'Generating...' : 'Generate Image'}
@@ -112,8 +155,11 @@ const App = () => {
                     </button>
                 )}
                 </div>
-              <button type="button" className="expand-button" >
+              <button onClick={handleDownload} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block" }}>
                 Download Image
+              </button>
+              <button type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block", marginLeft: "12px" }}>
+                Generate Music
               </button>
             </form>
         </div>
@@ -127,7 +173,6 @@ const App = () => {
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             height: '100vh',
-            width: '100vw',
             width: '100vw',
             display: 'flex',
             flexDirection: 'row',
@@ -154,6 +199,12 @@ const App = () => {
                     </button>
                 )}
                 </div>
+              <button onClick={handleDownload} type="button" className="expand-button" >
+                Download Image
+              </button>
+              <button type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block", marginLeft: "12px" }}>
+                Generate Music
+              </button>
             </form>
         </div>
       )}
