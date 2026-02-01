@@ -1,4 +1,6 @@
 import React, { useState} from 'react';
+import useSound from 'use-sound';
+import {Howl, Howler} from 'howler';
 import ReactDOM from "react-dom/client";
 import axios from 'axios';
 import './App.css';
@@ -9,6 +11,8 @@ import './App.css';
 const App = () => {
 
   const [location, setLocation] = useState('');
+  const [play, { pause, isPlaying }] = useSound('https://download.samplelib.com/mp3/sample-3s.mp3');
+  const [musicURL, setMusicURL] = useState('https://download.samplelib.com/mp3/sample-3s.mp3');
   const [imageData, setImageData] = useState('iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -60,7 +64,7 @@ const App = () => {
     setLoading(true);
     setError('');
     try {
-      const fullPrompt = "" + location + ""
+      const fullPrompt = "Lo-fi music that captures distinct elements of a particular location, specifically: " + location;
       //figure out prompt
 
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/generate-music`, {
@@ -72,6 +76,23 @@ const App = () => {
     }
     catch (err) {
       setError('Failed to generate music. Please try again.');
+      console.log(err);
+    }
+    setLoading(false);
+  };
+
+  const blahblah = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      /*const response = await axios.post(`${process.env.REACT_APP_API_URL}/fetch-music`, {
+        prompt: "",
+      });
+      */
+    }
+    catch (err) {
+      setError('Failed to fetch music. Please try again.');
       console.log(err);
     }
     setLoading(false);
@@ -158,8 +179,11 @@ const App = () => {
               <button onClick={handleDownload} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block" }}>
                 Download Image
               </button>
-              <button type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block", marginLeft: "12px" }}>
+              <button onClick={fetchMusic} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block", marginLeft: "12px" }}>
                 Generate Music
+              </button>
+              <button onClick={() => {blahblah();play();}} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block", marginLeft: "12px" }}>
+                Fetch Music
               </button>
             </form>
         </div>
@@ -202,7 +226,7 @@ const App = () => {
               <button onClick={handleDownload} type="button" className="expand-button" >
                 Download Image
               </button>
-              <button type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block", marginLeft: "12px" }}>
+              <button onClick={fetchMusic} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block", marginLeft: "12px" }}>
                 Generate Music
               </button>
             </form>
