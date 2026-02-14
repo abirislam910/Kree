@@ -1,29 +1,59 @@
-import React, { useState} from 'react';
-import useSound from 'use-sound';
-import {Howl, Howler} from 'howler';
+import React, {useState, useEffect} from 'react';
 import ReactDOM from "react-dom/client";
 import axios from 'axios';
 import './App.css';
 
 //iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==
 
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 const App = () => {
 
   const [location, setLocation] = useState('');
-  const [play, { pause, isPlaying }] = useSound('https://download.samplelib.com/mp3/sample-3s.mp3');
-  const [musicURL, setMusicURL] = useState('https://download.samplelib.com/mp3/sample-3s.mp3');
-  const [imageData, setImageData] = useState('iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==');
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [imageData, setImageData] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [audioBuffer, setAudioBuffer] = useState(null);
+  
+  useEffect(() => {
+    if (imageData && audioBuffer) {
+      const source = audioContext.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(audioContext.destination);
+      source.loop = true;
+      source.start(0);
+    }
+  }, [imageData, audioBuffer]);
+
+    useEffect(() => {
+        const handleMouseMove = (event) => {
+            const { clientX: x, clientY: y } = event;
+            setPosition({ x, y });
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+
+        return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        };
+    }, []);
+
+    const moveStyle = {
+        transform: `translate(${-((position.x - window.innerWidth / 2) / 50)}px, ${-((position.y - window.innerHeight / 2) / 50)}px)`,
+        transition: 'transform 0.8s ease-out',
+        animation: 'fadeIn 1s ease-in-out forwards',
+        alignSelf: 'center',
+        maxWidth: '30vw',
+      };
 
   const handleInputChange = (e) => {
     setLocation(e.target.value);
   };
 
   const fetchImage = async () => {
-    setLoading(true);
     setError('');
 
     if (!location.trim()) {
@@ -49,12 +79,11 @@ const App = () => {
     catch (err) {
       setError('Failed to fetch image. Please try again.');
       console.log(err);
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const fetchMusic = async () => {
-    setLoading(true);
     setError('');
 
     if (!location.trim()) {
@@ -64,48 +93,44 @@ const App = () => {
     setLoading(true);
     setError('');
     try {
-      const fullPrompt = "Lo-fi music that captures distinct elements of a particular location, specifically: " + location;
+      const fullPrompt = "Lo-fi track that captures distinct elements of a particular location, specifically: " + location;
       //figure out prompt
 
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/generate-music`, {
-        prompt: fullPrompt,
-      });
+      await audioContext.resume();
 
-      //setImageData(response.data.imageData);
-      //figure out how to handle response
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/generate-music`, 
+        {
+          prompt: fullPrompt,
+        },
+        {
+          responseType: "arraybuffer",
+        }
+      );
+
+      const buffer = await audioContext.decodeAudioData(response.data);
+      setAudioBuffer(buffer);
     }
     catch (err) {
       setError('Failed to generate music. Please try again.');
       console.log(err);
+      setLoading(false);
     }
-    setLoading(false);
-  };
-
-  const blahblah = async () => {
-    setLoading(true);
-    setError('');
-
-    try {
-      /*const response = await axios.post(`${process.env.REACT_APP_API_URL}/fetch-music`, {
-        prompt: "",
-      });
-      */
-    }
-    catch (err) {
-      setError('Failed to fetch music. Please try again.');
-      console.log(err);
-    }
-    setLoading(false);
   };
   
   const handleButtonClick = () => {
     setIsExpanded(!isExpanded);
   };
 
+  const handleGenerate = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    fetchImage();
+    fetchMusic();
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetchImage();
-  };
+  }
 
   const handleDownload = () => {
     if (!imageData) return;
@@ -119,11 +144,23 @@ const App = () => {
     document.body.removeChild(link);
   };
 
+  const playPause = () => {
+    const source = audioContext.createBufferSource();
+    if (!isPlaying) {
+      source.start();
+    } else {
+      source.start();
+      source.stop();
+    }
+    setIsPlaying(!isPlaying);
+  }
+
   return (
     <div className="app">
         <div>
-      <h1 className="fade-in-element">Where we going today?</h1>
-      <form onSubmit={handleSubmit} className="input-form">
+        <img style={moveStyle} src="./logo.png" alt="Logo" className="logo" />
+      <h1 className="fade-in-element">Study In Your Happy Place</h1>
+      <form onSubmit={handleGenerate} className="input-form">
         <input
           type="text"
           value={location}
@@ -167,9 +204,15 @@ const App = () => {
                         placeholder="Describe a location..."
                         className="secondinput-field"
                     />
-                    <button type="submit" className="secondsubmit-button" disabled={loading}>
-                    {loading ? 'Generating...' : 'Generate Image'}
-                    </button>                    </>
+                    {error ? (
+                      <button type="submit" className="failedsubmit-button" disabled={loading}>
+                        {loading ? 'Generating...' : 'Failed. Try Again!'}
+                    </button>
+                    ): (
+                      <button type="submit" className="secondsubmit-button" disabled={loading}>
+                        {loading ? 'Generating...' : 'Generate Image'}
+                    </button>
+                    )}                    </>
                 ) : (
                     <button type="button" onClick={handleButtonClick} className="expand-button">
                     Search
@@ -182,52 +225,8 @@ const App = () => {
               <button onClick={fetchMusic} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block", marginLeft: "12px" }}>
                 Generate Music
               </button>
-              <button onClick={() => {blahblah();play();}} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block", marginLeft: "12px" }}>
-                Fetch Music
-              </button>
-            </form>
-        </div>
-      )}
-
-    {imageData && error && (
-        <div
-          className="background-image"
-          style={{
-            backgroundImage: `url(data:image/png;base64,${imageData})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            height: '100vh',
-            width: '100vw',
-            display: 'flex',
-            flexDirection: 'row',
-          }}
-        >
-            <form className="secondinput-form" onSubmit={handleSubmit}>
-                <div className={`expandable-button ${isExpanded ? 'expanded' : ''}`}>
-                {isExpanded ? (
-                    <>
-                    <button type="button" className='secondexpand-button' onClick={handleButtonClick}>X</button>
-                    <input
-                        type="text"
-                        value={location}
-                        onChange={handleInputChange}
-                        placeholder="Describe a location..."
-                        className="secondinput-field"
-                    />
-                    <button type="submit" className="failedsubmit-button" disabled={loading}>
-                    {loading ? 'Generating...' : 'Failed. Try Again!'}
-                    </button>                    </>
-                ) : (
-                    <button type="button" onClick={handleButtonClick} className="expand-button">
-                    Search
-                    </button>
-                )}
-                </div>
-              <button onClick={handleDownload} type="button" className="expand-button" >
-                Download Image
-              </button>
-              <button onClick={fetchMusic} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block", marginLeft: "12px" }}>
-                Generate Music
+              <button onClick={playPause} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block", marginLeft: "12px" }}>
+                {isPlaying ? 'Pause' : 'Play'}
               </button>
             </form>
         </div>
