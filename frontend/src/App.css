@@ -1,240 +1,216 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body, html {
-    font-family: 'Arial', sans-serif;
-  }
-  
-  .app {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    text-align: center;
-    color: white;
-    overflow: hidden;
-  }
-  
-  h1 {
-    margin-bottom: 20px;
-    animation: fadeIn 2s ease-in-out forwards;
-  }
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  .logo {
-    animation: fadeIn 2s;
-    align-self: center;
-    max-width: 30vw;
-  }
-  
-  .input-form {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-    animation: fadeIn 2s ease-in-out forwards;
-  }
+body, html {
+  font-family: 'Arial', sans-serif;
+  background-color: #FFFDF5;
+}
 
-  .secondinput-form {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    width: 100vw;
-  }
-  
-  .input-field {
-    padding: 10px;
-    font-size: 22px;
-    width: 50vw;
-    height: 8vh;
-    margin-right: -1px;
-    border-radius: 30px 0px 0px 30px;
-    background-color: #3C151C;
-    border: 1px solid black;
-    color: #FFFDF5;
-    cursor: text;
-    text-indent: 15px;
-    animation: fadeIn 2s ease-in-out forwards;
-  }
+/* ---------- Layout ---------- */
 
-  .secondinput-field {
-    margin-top: -95vh;
-    padding: 10px;
-    font-size: 15px;
-    width: 500px;
-    height: 40px;
-    margin-right: -1px;
-    border-radius: 30px 0 0 30px;
-    background-color: #3C151C;
-    border: 1px solid #ccc;
-    color: #FFFDF5;
-    text-indent: 15px;
-    cursor: text;
-  }
-  
-  .submit-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 0 30px 30px 0;
-    cursor: pointer;
-    border: none;
-    background-color: #35BB8B;
-    color: white;
-    transition: background-color 0.3s ease;
-    animation: fadeIn 2s ease-in-out forwards;
-  }
+.app {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  min-width: 1000px;
+  height: 100vh;
+  text-align: center;
+  color: white;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
 
-  .submit-button:disabled {
-    background-color: #ccc;
-  }
-  
-  .submit-button:hover:not(:disabled) {
-    background-color: #37CB72;
-  }
+h1 {
+  margin-bottom: 2rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  animation: fadeIn 1.5s ease forwards;
+}
 
-  .secondsubmit-button {
-    margin-top: -95vh;
-    height: 40px;
-    padding: 10px 20px;
-    border-radius: 0 30px 30px 0;
-    font-size: 16px;
-    cursor: pointer;
-    border: none;
-    border: 1px solid #ccc;
-    background-color: #35BB8B;
-    color: white;
-    transition: background-color 0.3s ease;
-  }
+.logo {
+  max-width: 800px;
+  margin-bottom: 2rem;
+  animation: fadeIn 1.5s ease forwards;
+}
 
-  .secondsubmit-button:disabled {
-    background-color: #ccc;
-  }
-  
-  .secondsubmit-button:hover:not(:disabled) {
-    background-color: mediumseagreen;
-  }
+/* ---------- Forms ---------- */
 
-  .failedsubmit-button {
-    margin-top: -95vh;
-    height: 40px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border: none;
-    background-color: crimson;
-    color: white;
-    transition: background-color 0.3s ease;
-  }
+.input-form,
+.secondinput-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 1.5rem;
+  animation: fadeIn 1.5s ease forwards;
+}
 
-  .failedsubmit-button:disabled {
-    background-color: #ccc;
-  }
-  
-  .failedsubmit-button:hover:not(:disabled) {
-    background-color: red;
-  }
+.input-field,
+.secondinput-field {
+  padding: 0.9rem 1.2rem;
+  font-size: 1rem;
+  border-radius: 30px 0 0 30px;
+  background-color: #5C3317;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #FFFDF5;
+  outline: none;
+  text-indent: 10px;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
 
-  .expandable-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 120px;
-    height: 50px;
-    border-radius: 20px;
-    border-color: white;
-    transition: width 0.2s ease, border-radius 0.2s ease;
-    overflow: hidden;
-  }
-  
-  .expandable-button.expanded {
-    margin-top: 10px;
-    color: white;
-    width: 50vw;
-    height: 100vh;
-    position: absolute;
-    left: 26%;
-  }
-  
-  .expand-button {
-    margin-top: 10px;
-    border-radius: 10px;
-    background-color: #3C151C;
-    border: solid white 0.5px;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    padding: 10px 20px;
-    opacity: 0.1;
-    transition: opacity 0.3s ease;
-  }
+.input-field:focus,
+.secondinput-field:focus {
+  border-color: #35BB8B;
+  box-shadow: 0 0 0 3px rgba(53, 187, 139, 0.2);
+}
 
-  .expand-button:hover {
-    opacity: 1;
-  }
+/* ---------- Buttons ---------- */
 
-  .hidden {
-    opacity: 0;
-  }
+.submit-button,
+.secondsubmit-button {
+  height: 50px;
+  padding: 0 1.5rem;
+  font-size: 1rem;
+  border-radius: 0 30px 30px 0;
+  cursor: pointer;
+  border: none;
+  background-color: #35BB8B;
+  color: white;
+  font-weight: 500;
+  transition: background-color 0.25s ease, transform 0.15s ease;
+}
 
-  .secondexpand-button {
-    margin-top: -95vh;
-    margin-left: -30px;
-    background: none;
-    border-radius: 10px;
-    background-color: #3C151C;
-    border: solid white 0.5px;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    padding: 10px 20px;
-  }
-  
-  .error-message {
-    color: red;
-    margin-top: 20px;
-  }
-  
-  .background-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-  }
-  
-  .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .info-text {
-    font-size: 24px;
-    font-weight: bold;
-    z-index: 10;
-  }
-  
-  .fade-in-element {
-    opacity: 0;
-    animation: fadeIn 1s ease-in-out forwards;
-    font-size: 20px;
-    color: #3C151C;
-    text-decoration: underline;
-  }
+.submit-button:hover:not(:disabled),
+.secondsubmit-button:hover:not(:disabled) {
+  background-color: #37CB72;
+}
 
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
+.submit-button:disabled,
+.secondsubmit-button:disabled {
+  background-color: #777;
+  cursor: not-allowed;
+}
+
+.failedsubmit-button {
+  height: 50px;
+  padding: 0 1.5rem;
+  border-radius: 30px;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+  background-color: crimson;
+  color: white;
+  transition: background-color 0.25s ease;
+}
+
+.failedsubmit-button:hover:not(:disabled) {
+  background-color: red;
+}
+
+/* ---------- Expandable Section ---------- */
+
+.expandable-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 140px;
+  height: 50px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.expandable-button.expanded {
+  width: 60vw;
+  max-width: 800px;
+  height: auto;
+  padding: 2rem;
+  border-radius: 25px;
+  background: rgba(60, 21, 28, 0.95);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+.expand-button,
+.secondexpand-button {
+  margin-top: 1rem;
+  border-radius: 10px;
+  background-color: #3C151C;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 0.6rem 1.2rem;
+  transition: background-color 0.25s ease, opacity 0.25s ease;
+}
+
+.expand-button {
+  opacity: 0.6;
+}
+
+.expand-button:hover,
+.secondexpand-button:hover {
+  opacity: 1;
+  background-color: #4a1d24;
+}
+
+/* ---------- Feedback ---------- */
+
+.error-message {
+  color: crimson;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+/* ---------- Background / Overlay ---------- */
+
+.background-image {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: -1;
+}
+
+.info-text {
+  font-size: 1.4rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* ---------- Utility ---------- */
+
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fade-in-element {
+  opacity: 0;
+  animation: fadeIn 1s ease forwards;
+  font-size: 1rem;
+  color: #5C3317;
+  text-decoration: underline;
+}
+
+/* ---------- Animation ---------- */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

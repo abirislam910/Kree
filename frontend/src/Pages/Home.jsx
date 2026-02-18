@@ -3,8 +3,6 @@ import axios from 'axios';
 import { Link } from "react-router-dom";
 import '../App.css';
 
-//iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==
-
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 function Home() {
@@ -46,7 +44,8 @@ function Home() {
         transition: 'transform 0.8s ease-out',
         animation: 'fadeIn 1s ease-in-out forwards',
         alignSelf: 'center',
-        maxWidth: '30vw',
+        minWidth: '700px',
+        width: '40vw',
       };
 
   const handleInputChange = (e) => {
@@ -159,8 +158,10 @@ function Home() {
         <div>
         <Link to="/login">blah</Link>
         <Link to="/registration">bloo</Link>
-        <img style={moveStyle} src="./logo.png" alt="Logo" className="logo" />
-        <h1 className="fade-in-element">Study In Your Happy Place</h1>
+        <img style={moveStyle} src="./logo.png" alt="Logo"/>
+        <h1 className="fade-in-element" style={{
+              fontSize: '1.5rem',
+            }}>Study In Your Happy Place</h1>
         <form onSubmit={handleGenerate} className="input-form">
           <input
             type="text"
@@ -169,10 +170,14 @@ function Home() {
             placeholder="Describe a location..."
             className="input-field"
             style={{
-              minHeight: '40px',
+              minHeight: '4vw',
+              width: '50vw',
             }}
           />
-          <button type="submit" className="submit-button" disabled={loading}>
+          <button type="submit" className="submit-button" disabled={loading} style={{
+              minHeight: '4vw',
+              width: '12vw',
+            }}>
             {loading ? 'Generating...' : 'Generate Image'}
           </button>
         </form>
@@ -182,14 +187,13 @@ function Home() {
 
       {imageData && (
         <div
-          className="background-image"
           style={{
             backgroundImage: `url(data:image/png;base64,${imageData})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             height: '100vh',
             width: '100vw',
-            display: 'flex',
+            display: 'absolute',
             flexDirection: 'row',
           }}
         >
