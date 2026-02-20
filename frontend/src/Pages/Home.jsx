@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import { Link } from "react-router-dom";
+import supabase from "../Supabase/supabaseClient";
 import '../App.css';
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -62,8 +63,7 @@ function Home() {
     setLoading(true);
     setError('');
     try {
-      const fullPrompt = "A cozy, colorful landscape image that transports a person to the interior of " + location + 
-        ", with cozy details and a lively setting, resembling the background of a lofi youtube video"
+      const fullPrompt = "Ultra-detailed lofi anime-style illustration of a cozy interior scene inspired by " + location + ". Warm ambient lighting, golden hour glow, soft shadows, gentle depth of field. Aesthetic clutter: plants, books, textured fabrics, warm lamps, anything that fits the specified location:" + location + ". Calm, nostalgic, peaceful mood. Soft grain, muted but colorful palette.";
 
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/generate-image`, {
         prompt: fullPrompt,
@@ -92,7 +92,7 @@ function Home() {
     setLoading(true);
     setError('');
     try {
-      const fullPrompt = "Lo-fi track that captures distinct elements of a particular location, specifically: " + location;
+      const fullPrompt = "Chill lo-fi instrumental track, 70-85 BPM. Warm vinyl texture, soft tape saturation, subtle crackle. Instruments inspired by" + location + ". Dreamy electric piano chords, mellow bassline, soft boom-bap drums"
 
       await audioContext.resume();
 
@@ -117,6 +117,14 @@ function Home() {
   
   const handleButtonClick = () => {
     setIsExpanded(!isExpanded);
+  };
+
+  const getUserData = async () => {
+    const { data, error } = await supabase.auth.getSession()
+
+    if (data) {console.log(data.session.user.user_metadata.name)}
+
+    if (error) {console.log(error)}
   };
 
   const handleGenerate = (e) => {
@@ -156,8 +164,6 @@ function Home() {
   return (
     <div className="app">
         <div>
-        <Link to="/login">blah</Link>
-        <Link to="/registration">bloo</Link>
         <img style={moveStyle} src="./logo.png" alt="Logo"/>
         <h1 className="fade-in-element" style={{
               fontSize: '1.5rem',
@@ -187,16 +193,9 @@ function Home() {
 
       {imageData && (
         <div
-          style={{
-            backgroundImage: `url(data:image/png;base64,${imageData})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            height: '100vh',
-            width: '100vw',
-            display: 'absolute',
-            flexDirection: 'row',
-          }}
-        >
+            className="fullscreen-background"
+            style={{ backgroundImage: `url(data:image/png;base64,${imageData})` }}
+            >
             <form className="secondinput-form" onSubmit={handleSubmit}>
                 <div className={`expandable-button ${isExpanded ? 'expanded' : ''}`}>
                 {isExpanded ? (
