@@ -1,6 +1,7 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import axios from 'axios';
-import { Link } from "react-router-dom";
+import Header from './Header.jsx';
+import { UserContext }  from './UserContext.jsx';
 import supabase from "../Supabase/supabaseClient";
 import '../App.css';
 
@@ -13,10 +14,15 @@ function Home() {
   const [imageData, setImageData] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { user, setUser } = useContext(UserContext);
   const [isExpanded, setIsExpanded] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [audioBuffer, setAudioBuffer] = useState(null);
-  
+
+  useEffect(() => {
+        getUserData();
+    }, []);   
+
   useEffect(() => {
     if (imageData && audioBuffer) {
       const source = audioContext.createBufferSource();
@@ -122,8 +128,10 @@ function Home() {
   const getUserData = async () => {
     const { data, error } = await supabase.auth.getSession()
 
-    if (data) {console.log(data.session.user.user_metadata.name)}
-
+    if (data.session) {
+        console.log(data.session.user.user_metadata.name)
+        setUser(data.session.user.user_metadata.name) 
+    }
     if (error) {console.log(error)}
   };
 
@@ -162,31 +170,33 @@ function Home() {
   }
 
   return (
-    <div className="app">
-        <div>
-        <img style={moveStyle} src="./logo.png" alt="Logo"/>
-        <h1 className="fade-in-element" style={{
-              fontSize: '1.5rem',
-            }}>Study In Your Happy Place</h1>
-        <form onSubmit={handleGenerate} className="input-form">
-          <input
-            type="text"
-            value={location}
-            onChange={handleInputChange}
-            placeholder="Describe a location..."
-            className="input-field"
-            style={{
-              minHeight: '4vw',
-              width: '50vw',
-            }}
-          />
-          <button type="submit" className="submit-button" disabled={loading} style={{
-              minHeight: '4vw',
-              width: '12vw',
-            }}>
-            {loading ? 'Generating...' : 'Generate Image'}
-          </button>
-        </form>
+    <div>
+        <Header user={user} />
+        <div className="app">
+            {user && <h1 className='nav-links'>Hello {user}!</h1>}
+            <img style={moveStyle} src="./logo.png" alt="Logo"/>
+            <h1 className="fade-in-element" style={{
+                fontSize: '1.5rem',
+                }}>Study In Your Happy Place</h1>
+            <form onSubmit={handleGenerate} className="input-form">
+                <input
+                    type="text"
+                    value={location}
+                    onChange={handleInputChange}
+                    placeholder="Describe a location..."
+                    className="input-field"
+                    style={{
+                    minHeight: '4vw',
+                    width: '50vw',
+                    }}
+                />
+                <button type="submit" className="submit-button" disabled={loading} style={{
+                    minHeight: '4vw',
+                    width: '12vw',
+                    }}>
+                    {loading ? 'Generating...' : 'Generate Image'}
+                </button>
+            </form>
         </div>
 
       {error && <p className="error-message">{error}</p>}

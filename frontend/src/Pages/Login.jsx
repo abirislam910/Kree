@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import supabase from "../Supabase/supabaseClient";
+import Header from './Header.jsx';
+import { UserContext } from './UserContext.jsx';
 import { Link, useNavigate } from "react-router-dom";
 import '../App.css'
 
 function Login() {
   const navigate = useNavigate();
+  const { user, setUser } = useContext(UserContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -29,47 +32,51 @@ function Login() {
     }
 
     if (data) {
+      setUser(data.session.user.user_metadata.name)
       navigate("/");
       return null;
     }
   };
 
     return (
-        <div className="auth-container">
-            <div className="auth-card">
-                <h1 className="auth-title">Welcome Back</h1>
-                <p className="auth-subtitle">Sign in to continue</p>
-                {message && <span className="auth-subtitle">{message}</span>}
-                <form onSubmit={handleSubmit} className="auth-form">
-                <input
-                    onChange={(e) => setEmail(e.target.value)}
-                    value={email}
-                    required
-                    type="email"
-                    placeholder="Email"
-                    className="auth-input"
-                />
-                <input
-                    onChange={(e) => setPassword(e.target.value)}
-                    value={password}
-                    required
-                    type="password"
-                    placeholder="Password"
-                    className="auth-input"
-                />
+        <div>
+            <Header />
+            <div className="auth-container">
+                <div className="auth-card">
+                    <h2 className="auth-title">Log In</h2>
+                    <p className="auth-subtitle">Welcome Back!</p>
+                    {message && <span className="auth-subtitle">{message}</span>}
+                    <form onSubmit={handleSubmit} className="auth-form">
+                    <input
+                        onChange={(e) => setEmail(e.target.value)}
+                        value={email}
+                        required
+                        type="email"
+                        placeholder="Email"
+                        className="auth-input"
+                    />
+                    <input
+                        onChange={(e) => setPassword(e.target.value)}
+                        value={password}
+                        required
+                        type="password"
+                        placeholder="Password"
+                        className="auth-input"
+                    />
 
-                <button type="submit" className="auth-button" style={{
-                    opacity: loading ? 0.7 : 1,
-                    cursor: loading ? "not-allowed" : "pointer"}}>
-                    {loading ? "Signing in..." : "Log In"}
-                </button>
-                </form>
+                    <button type="submit" className="auth-button" style={{
+                        opacity: loading ? 0.7 : 1,
+                        cursor: loading ? "not-allowed" : "pointer"}}>
+                        {loading ? "Signing in..." : "Log In"}
+                    </button>
+                    </form>
 
-                <p className="auth-footer">
-                    Don’t have an account?
-                    <br></br>
-                    <Link to="/registration" className="auth-link" style={{textDecoration: 'none'}}>Register.</Link>
-                </p>
+                    <span className="auth-footer">
+                        <br></br>
+                        <p>Don’t have an account?</p>
+                        <Link to="/registration" className="auth-link" style={{textDecoration: 'none'}}>Register</Link>
+                    </span>
+                </div>
             </div>
         </div>
     );

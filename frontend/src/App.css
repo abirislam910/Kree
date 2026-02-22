@@ -115,7 +115,6 @@ html, body, #root {
   color: white;
   padding: 2rem;
   position: relative;
-  overflow: visible;
 }
 
 h1 {
@@ -174,8 +173,7 @@ h1 {
 .submit-button,
 .secondsubmit-button {
   height: 50px;
-  padding: 0 1.5rem;
-  font-size: 1rem;
+  font-size: 1.2rem;
   border-radius: 0 30px 30px 0;
   cursor: pointer;
   border: none;
@@ -301,10 +299,45 @@ h1 {
 
 .fade-in-element {
   opacity: 0;
-  animation: fadeIn 1s ease forwards;
+  animation: fadeIn 2s ease forwards;
   font-size: 1rem;
   color: #5C3317;
   text-decoration: underline;
+}
+
+/* ---------- Header ---------- */
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 10vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  z-index: 1000;
+}
+
+.nav-links {
+  color: #35BB8B;
+  text-decoration: none;
+  font-weight: 500;
+  display: flex;
+  gap: 2rem;
+  animation: fadeIn 1.5s ease forwards;
+}
+
+.nav-links a {
+  color: #35BB8B;
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+.nav-links a:hover {
+  opacity: 0.7;
 }
 
 /* ---------- Animation ---------- */
