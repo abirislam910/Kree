@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import supabase from "../Supabase/supabaseClient";
 import Header from './Header.jsx';
 import { UserContext } from './UserContext.jsx';
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import '../App.css'
 
 function Signout() {

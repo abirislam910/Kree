@@ -171,9 +171,9 @@ function Home() {
 
   return (
     <div>
-        <Header user={user} />
+        <Header user={user} image={imageData ? true : false}/>
         <div className="app">
-            {user && <h1 className='nav-links'>Hello {user}!</h1>}
+            {user && <h1 className= 'nav-links'>Hello {user}!</h1>}
             <img style={moveStyle} src="./logo.png" alt="Logo"/>
             <h1 className="fade-in-element" style={{
                 fontSize: '1.5rem',
@@ -191,8 +191,8 @@ function Home() {
                     }}
                 />
                 <button type="submit" className="submit-button" disabled={loading} style={{
-                    minHeight: '4vw',
-                    width: '12vw',
+                      minHeight: '4vw',
+                      width: '12vw',
                     }}>
                     {loading ? 'Generating...' : 'Generate Image'}
                 </button>
@@ -210,36 +210,35 @@ function Home() {
                 <div className={`expandable-button ${isExpanded ? 'expanded' : ''}`}>
                 {isExpanded ? (
                     <>
-                    <button type="button" className='secondexpand-button' onClick={handleButtonClick}>X</button>
+                    <button type="button" className='expand-button' onClick={handleButtonClick} style={{color: '#5C3317'}}>X</button>
                     <input
                         type="text"
                         value={location}
                         onChange={handleInputChange}
                         placeholder="Describe a location..."
-                        className="secondinput-field"
+                        className="input-field"
+                        style={{
+                          minHeight: '4vw',
+                          width: '50vw',
+                          }}
                     />
-                    {error ? (
-                      <button type="submit" className="failedsubmit-button" disabled={loading}>
-                        {loading ? 'Generating...' : 'Failed. Try Again!'}
+                      <button type="submit" className="secondsubmit-button" disabled={loading} style={{
+                      minHeight: '4vw',
+                      width: '25vw',
+                    }}>
+                        {loading ? 'Generating...' : error ? 'Failed. Try Again!' : 'Generate New Image'}
                     </button>
-                    ): (
-                      <button type="submit" className="secondsubmit-button" disabled={loading}>
-                        {loading ? 'Generating...' : 'Generate Image'}
-                    </button>
-                    )}                    </>
+                    </>
                 ) : (
                     <button type="button" onClick={handleButtonClick} className="expand-button">
                     Search
                     </button>
                 )}
                 </div>
-              <button onClick={handleDownload} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block" }}>
-                Download Image
+              <button onClick={handleDownload} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
+                Download
               </button>
-              <button onClick={fetchMusic} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block", marginLeft: "12px" }}>
-                Generate Music
-              </button>
-              <button onClick={playPause} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block", marginLeft: "12px" }}>
+              <button onClick={playPause} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
                 {isPlaying ? 'Pause' : 'Play'}
               </button>
             </form>

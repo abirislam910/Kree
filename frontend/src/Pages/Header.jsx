@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import Hamburger from 'hamburger-react'
 import { Link } from "react-router-dom";
 import '../App.css';
@@ -8,8 +8,8 @@ function Header(props) {
 
   return (
     <div className="header">
-      <Hamburger toggled={isOpen} toggle={setOpen} color='#35BB8B'/>
-      <nav className={`nav-links`}>
+      <Hamburger toggled={isOpen} toggle={setOpen} color={props.image ? '#faf7eb' : '#35BB8B'}/>
+      <nav className={props.image ? "nav-links-image" : "nav-links"}>
         {isOpen && window.location.pathname !== '/' && 
           <Link to="/">
             <strong>Home</strong>
