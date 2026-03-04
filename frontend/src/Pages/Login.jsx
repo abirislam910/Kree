@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import supabase from "../Supabase/supabaseClient";
+import supabase from "../Supabase/supabaseClient.js";
 import Header from './Header.jsx';
 import { UserContext } from './UserContext.jsx';
 import { Link, useNavigate } from "react-router-dom";

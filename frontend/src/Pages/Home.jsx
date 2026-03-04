@@ -2,7 +2,7 @@ import React, {useState, useEffect, useContext} from 'react';
 import axios from 'axios';
 import Header from './Header.jsx';
 import { UserContext }  from './UserContext.jsx';
-import supabase from "../Supabase/supabaseClient";
+import supabase from "../Supabase/supabaseClient.js";
 import '../App.css';
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import supabase from "../Supabase/supabaseClient";
+import supabase from "../Supabase/supabaseClient.js";
 import Header from './Header.jsx';
 import { Link } from "react-router-dom";
 
