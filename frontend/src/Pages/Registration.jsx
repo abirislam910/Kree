@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import supabase from "../Supabase/supabaseClient.js";
 import Header from './Header.jsx';
 import { Link } from "react-router-dom";
 
@@ -13,17 +12,8 @@ function Registration() {
     event.preventDefault();
     setMessage("");
 
-  const { data, error } = await supabase.auth.signUp(
-    {
-        email: email,
-        password: password,
-        options: {
-        data: {
-            name: name,
-        }
-        }
-    }
-    )
+  //const { error } = await supabase.auth.signOut()
+    const {data, error} = null; // Placeholder for actual sign-out logic
     if (error) {
       setMessage(error.message);
       return;

@@ -1,8 +1,8 @@
 import React, { useState, useContext } from "react";
-import supabase from "../Supabase/supabaseClient.js";
 import Header from './Header.jsx';
 import { UserContext } from './UserContext.jsx';
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import '../App.css'
 
 function Login() {
@@ -13,28 +13,27 @@ function Login() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setMessage("");
     setLoading(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    });
+    try {
+      const response = await axios.post(`http://localhost:4000/api/login`, {
+        email: email,
+        password: password
+      });
 
-    if (error) {
-      setMessage(error.message);
+      setUser(response.data);
+      console.log(response.data);
+      navigate("/");
+    }
+    catch (err) {
+      setMessage(err);
       setEmail("");
       setPassword("");
       setLoading(false);
-      return;
-    }
-
-    if (data) {
-      setUser(data.session.user.user_metadata.name)
-      navigate("/");
-      return null;
+      console.log(err);
     }
   };
 
@@ -71,11 +70,11 @@ function Login() {
                     </button>
                     </form>
 
-                    <span className="auth-footer">
+                    {<span className="auth-footer">
                         <br></br>
                         <p>Don’t have an account?</p>
                         <Link to="/registration" className="auth-link" style={{textDecoration: 'none'}}>Register</Link>
-                    </span>
+                    </span>}
                 </div>
             </div>
         </div>

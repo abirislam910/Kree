@@ -2,6 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const { createClient } = require("./lib/supabase.js")
 
 dotenv.config();
 
@@ -14,7 +15,7 @@ app.use((req, res, next) => {
 });  
 
 app.use(cors({
-    origin: 'https://kree-app.vercel.app',
+    //origin: 'https://kree-app.vercel.app,
   }));
 
   app.options('*', (req, res) => {
@@ -94,6 +95,24 @@ app.post('/api/generate-music', async (req, res) => {
     } catch (error) {
       console.error('Error generating task:', error);
       res.status(500).json({ message: 'Error generating task', error });
+    }
+  });
+
+  app.post('/api/login', async (req, res) => {
+    const {email, password} = req.body;    
+    try {
+      const supabase = createClient({ req, res })
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      })
+      res.send(data.session.user.user_metadata.name);
+      console.log("login successful");
+      
+    } catch (error) {
+      console.error('Error logging in:', error);
+      res.status(500).json({ message: 'Error logging in', error });
     }
   });
 
