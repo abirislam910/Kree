@@ -2,7 +2,6 @@ import React, {useState, useEffect, useContext} from 'react';
 import axios from 'axios';
 import Header from './Header.jsx';
 import { UserContext }  from './UserContext.jsx';
-import supabase from "../Supabase/supabaseClient.js";
 import '../App.css';
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -126,13 +125,14 @@ function Home() {
   };
 
   const getUserData = async () => {
-    const { data, error } = await supabase.auth.getSession()
+    //const { data, error } = await supabase.auth.getSession()
+      console.log("Fetching user data..."); // Placeholder for actual session retrieval logic
 
-    if (data.session) {
+    /*if (data.session) {
         console.log(data.session.user.user_metadata.name)
         setUser(data.session.user.user_metadata.name) 
     }
-    if (error) {console.log(error)}
+    if (error) {console.log(error)}*/
   };
 
   const handleGenerate = (e) => {

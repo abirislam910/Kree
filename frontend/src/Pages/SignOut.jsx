@@ -1,5 +1,4 @@
 import React, { useState, useContext } from "react";
-import supabase from "../Supabase/supabaseClient.js";
 import Header from './Header.jsx';
 import { UserContext } from './UserContext.jsx';
 import { useNavigate } from "react-router-dom";
@@ -16,7 +15,8 @@ function Signout() {
     setMessage("");
     setLoading(true);
 
-    const { error } = await supabase.auth.signOut()
+    //const { error } = await supabase.auth.signOut()
+    const error = null; // Placeholder for actual sign-out logic
 
     if (error) {
       setMessage(error.message)
