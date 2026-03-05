@@ -1,28 +1,37 @@
 import React, { useState } from "react";
 import Header from './Header.jsx';
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 function Registration() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setMessage("");
+    setLoading(true);
 
-  //const { error } = await supabase.auth.signOut()
-    const {data, error} = null; // Placeholder for actual sign-out logic
-    if (error) {
-      setMessage(error.message);
-      return;
-    }
+    try {
+      await axios.post(`${process.env.REACT_APP_API_URL}/registration`, {
+        email: email,
+        password: password,
+        name: name
+      },
+       { withCredentials: true }
+    );
 
-    if (data) {
       setMessage("Please check your email for a confirmation link");
     }
+    catch (err) {
+      setMessage(err);
+      console.log(err);
+    }
 
+    setLoading(false);
     setEmail("");
     setPassword("");
     setName("");
@@ -61,7 +70,7 @@ function Registration() {
                     required
                     className="auth-input"
                     />
-                    <button type="submit" className="auth-button">Create Account</button>
+                    <button type="submit" className="auth-button">{loading ? "Registering..." : "Register"}</button>
                 </form>
                 <p className="auth-footer">Already have an account?
                     <br></br>
