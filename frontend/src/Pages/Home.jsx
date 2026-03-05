@@ -20,7 +20,7 @@ function Home() {
 
   useEffect(() => {
         getUserData();
-    }, []);   
+    }, []);
 
   useEffect(() => {
     if (imageData && audioBuffer) {
@@ -125,14 +125,14 @@ function Home() {
   };
 
   const getUserData = async () => {
-    //const { data, error } = await supabase.auth.getSession()
-      console.log("Fetching user data..."); // Placeholder for actual session retrieval logic
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/getuser`, {}, { withCredentials: true });
 
-    /*if (data.session) {
-        console.log(data.session.user.user_metadata.name)
-        setUser(data.session.user.user_metadata.name) 
+      setUser(response.data);
     }
-    if (error) {console.log(error)}*/
+    catch (err) {      
+      console.log('Error fetching user data:', err);
+    }
   };
 
   const handleGenerate = (e) => {

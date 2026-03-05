@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import Header from './Header.jsx';
 import { UserContext } from './UserContext.jsx';
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import '../App.css'
 
 function Signout() {
@@ -15,17 +16,15 @@ function Signout() {
     setMessage("");
     setLoading(true);
 
-    //const { error } = await supabase.auth.signOut()
-    const error = null; // Placeholder for actual sign-out logic
+    try {
+      await axios.post(`${process.env.REACT_APP_API_URL}/signout`, {}, { withCredentials: true });
 
-    if (error) {
-      setMessage(error.message)
-      return;
-    }
-    else {
-      setLoading(false);
-      setUser('')
+      setUser('');
       navigate("/");
+    }
+    catch (err) {
+      setMessage(err.message)
+      console.log(err);
     }
   };
 

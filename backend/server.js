@@ -15,6 +15,10 @@ app.use((req, res, next) => {
 });  
 
 app.use(cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+    allowedHeaders: ['Authorization', 'Content-Type'],
+    methods: ['GET', 'POST', 'OPTIONS'],
     //origin: 'https://kree-app.vercel.app,
   }));
 
@@ -60,7 +64,7 @@ app.post('/api/generate-image', async (req, res) => {
       console.error("STATUS:", error.response?.status);
       console.error("HEADERS:", error.response?.headers);
       console.error("DATA:", error.response?.data);
-      res.status(500).json({ message: 'Error generating image', error });
+      res.status(500).json({ message: 'Error generating image: ', error });
     }
   });
 
@@ -94,7 +98,7 @@ app.post('/api/generate-music', async (req, res) => {
   
     } catch (error) {
       console.error('Error generating task:', error);
-      res.status(500).json({ message: 'Error generating task', error });
+      res.status(500).json({ message: 'Error generating task: ', error });
     }
   });
 
@@ -112,7 +116,61 @@ app.post('/api/generate-music', async (req, res) => {
       
     } catch (error) {
       console.error('Error logging in:', error);
-      res.status(500).json({ message: 'Error logging in', error });
+      res.status(500).json({ message: 'Error logging in: ', error });
+    }
+  });
+
+  app.post('/api/registration', async (req, res) => {
+    const {email, password, name} = req.body;    
+    try {
+      const supabase = createClient({ req, res })
+
+      const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            name: name
+          }
+        }
+      })
+      console.log("Registration successful");
+      
+    } catch (error) {
+      console.error('Error registering: ', error);
+      res.status(500).json({ message: 'Error registering: ', error });
+    }
+  });
+
+  app.post('/api/signout', async (req, res) => { 
+    try {
+      const supabase = createClient({ req, res })
+
+      const { error } = await supabase.auth.signOut()
+      console.log("Signout successful");
+      res.sendStatus(200);
+    } catch (error) {
+      console.error('Error signing out: ', error);
+      res.status(500).json({ message: 'Error signing out: ', error });
+    }
+  });
+
+  app.post('/api/getuser', async (req, res) => { 
+    try {
+      const supabase = createClient({ req, res })
+
+      const { data: { user } } = await supabase.auth.getUser()
+
+      console.log("User retrieved successfully");
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      else {
+      res.send(user.user_metadata.name);
+      }
+    } catch (error) {
+      console.error('Error retrieving user: ', error);
+      res.status(500).json({ message: 'Error retrieving user: ', error });
     }
   });
 
