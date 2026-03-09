@@ -26,12 +26,13 @@ function Login() {
        { withCredentials: true }
     );
 
+      console.log("Login successful");
       setUser(response.data);
       console.log(response.data);
       navigate("/");
     }
     catch (err) {
-      setMessage(err);
+      setMessage("Error logging in");
       setEmail("");
       setPassword("");
       setLoading(false);
@@ -45,8 +46,8 @@ function Login() {
             <div className="auth-container">
                 <div className="auth-card">
                     <h2 className="auth-title">Log In</h2>
-                    <p className="auth-subtitle">Welcome Back!</p>
-                    {message && <span className="auth-subtitle">{message}</span>}
+                    {!message && <p className="auth-subtitle">Welcome Back!</p>}
+                    {message && <p className="auth-subtitle" style={{color: 'red'}}><strong>{message}</strong></p>}
                     <form onSubmit={handleSubmit} className="auth-form">
                     <input
                         onChange={(e) => setEmail(e.target.value)}
