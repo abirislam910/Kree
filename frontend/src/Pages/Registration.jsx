@@ -7,7 +7,7 @@ function Registration() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [message, setMessage] = useState("Please check your email for a confirmation link");
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -44,7 +44,7 @@ function Registration() {
             <div className="auth-card">
                 <h2 className="auth-title">Register</h2>
                 {!message && <p className="auth-subtitle">Welcome to Kree!</p>}
-                {message && <p className="auth-subtitle">{message}</p>}
+                {message && <p className="auth-subtitle" style={{color: message === "Please check your email for a confirmation link" ? 'white':'red'}}>{message}</p>}
                 <form onSubmit={handleSubmit} className="auth-form">
                     <input
                     onChange={(e) => setEmail(e.target.value)}

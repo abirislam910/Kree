@@ -11,7 +11,6 @@ exports.createClient = (context) => {
         },
 
         setAll(cookiesToSet) {
-          console.log("Setting cookies: ", cookiesToSet);
           const cookies = cookiesToSet.map(({ name, value, options }) =>
             serializeCookieHeader(name, value, {
               ...options,
