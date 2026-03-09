@@ -198,8 +198,21 @@ app.post('/api/generate-music', async (req, res) => {
       }
 
       console.log("User found, proceeding with upload");
+      console.log("User ID: ", user.id);
 
-      const { data, error } = await supabase.storage.from('generated_images').upload(`${user.id}/image.png`, decode(imageData), {
+      const { list, listError } = await supabase
+        .storage
+        .from('generated_images')
+        .list(user.id, {});
+
+      const count = list;
+      if (listError) {
+        console.error('Error listing images: ', listError);
+      }
+      
+      console.log("Count: ", count);
+
+      const { data, dataError } = await supabase.storage.from('generated_images').upload(`${user.id}/image${count + 1}.png`, decode(imageData), {
         contentType: 'image/png',
         cacheControl: '3600',
       });
