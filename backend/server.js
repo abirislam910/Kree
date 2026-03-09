@@ -2,33 +2,38 @@ const express = require('express');
 const axios = require('axios');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const { createClient } = require("./lib/supabase.js")
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+const ORIGIN = process.env.FRONTEND_URL || 'http://localhost:3000';
 
 app.use((req, res, next) => {
   console.log(`Incoming Request: ${req.method} ${req.url}`);
   next();
 });  
 
+app.use(cookieParser());
+
 app.use(cors({
-    origin: process.env.CLIENT_URL,
     credentials: true,
     allowedHeaders: ['Authorization', 'Content-Type'],
     methods: ['GET', 'POST', 'OPTIONS'],
-    //origin: 'https://kree-app.vercel.app,
+    origin: ORIGIN,
   }));
 
   app.options('*', (req, res) => {
-    res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+    res.set('Access-Control-Allow-Credentials', 'true');
     res.status(200).send();
 });
 app.use(express.json());
+
+console.log(ORIGIN);
 
 app.post('/api/generate-image', async (req, res) => {
     const { prompt } = req.body;
@@ -135,7 +140,7 @@ app.post('/api/generate-music', async (req, res) => {
         }
       })
       console.log("Registration successful");
-      
+      res.sendStatus(200);
     } catch (error) {
       console.error('Error registering: ', error);
       res.status(500).json({ message: 'Error registering: ', error });
@@ -157,12 +162,15 @@ app.post('/api/generate-music', async (req, res) => {
 
   app.post('/api/getuser', async (req, res) => { 
     try {
+      console.log('Cookies:', req.cookies);
+      
       const supabase = createClient({ req, res })
 
       const { data: { user } } = await supabase.auth.getUser()
 
-      console.log("User retrieved successfully");
+      console.log("Call retrieved successfully");
       if (!user) {
+        console.log("User not found");
         return res.status(404).json({ message: 'User not found' });
       }
       else {
