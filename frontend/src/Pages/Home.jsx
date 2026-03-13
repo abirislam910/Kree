@@ -158,6 +158,15 @@ function Home() {
     document.body.removeChild(link);
   };
 
+  const handleUpload = async () => {
+    try {
+      await axios.post(`${process.env.REACT_APP_API_URL}/uploadimage`, { imageData: imageData }, { withCredentials: true });
+      console.log('Upload successful');
+    } catch (err) {
+      console.error('Error uploading image:', err);
+    }
+  }
+
   const playPause = () => {
     const source = audioContext.createBufferSource();
     if (!isPlaying) {
@@ -237,6 +246,9 @@ function Home() {
                 </div>
               <button onClick={handleDownload} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
                 Download
+              </button>
+              <button onClick={handleUpload} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
+                Upload
               </button>
               <button onClick={playPause} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
                 {isPlaying ? 'Pause' : 'Play'}
