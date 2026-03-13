@@ -1,65 +1,27 @@
-import React, {useState, useEffect, useContext} from 'react';
-import axios from 'axios';
+import React, { useState, useContext } from "react";
 import Header from './Header.jsx';
-import { UserContext }  from './UserContext.jsx';
+import { UserContext } from './UserContext.jsx';
 import { ContentContext } from './ContentContext.jsx';
 import { useNavigate } from "react-router-dom";
-import '../App.css';
+import axios from "axios";
+import '../App.css'
 
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-function Home() {
-
-  const [location, setLocation] = useState('');
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+function GeneratedPage() {
+  const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext);
-  const { imageData, setImageData, audioBuffer, setAudioBuffer } = useContext(ContentContext);
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [error, setError] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const navigate = useNavigate();
 
-  useEffect(() => {
-        getUserData();
-    }, []);
+  const { imageData, setImageData, audioBuffer, setAudioBuffer } = useContext(ContentContext);
+  setImageData('');
+  setAudioBuffer(null);
 
-  useEffect(() => {
-    if (imageData && audioBuffer) {
-      /*const source = audioContext.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(audioContext.destination);
-      source.loop = true;
-      source.start(0);*/
-      console.log('imageData: ', imageData);
-      console.log('audioBuffer: ', audioBuffer);
-      navigate('/generated');
-    }
-  }, [imageData, audioBuffer]);
-
-    useEffect(() => {
-        const handleMouseMove = (event) => {
-            const { clientX: x, clientY: y } = event;
-            setPosition({ x, y });
-        };
-
-        window.addEventListener('mousemove', handleMouseMove);
-
-        return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        };
-    }, []);
-
-    const moveStyle = {
-        transform: `translate(${-((position.x - window.innerWidth / 2) / 50)}px, ${-((position.y - window.innerHeight / 2) / 50)}px)`,
-        transition: 'transform 0.8s ease-out',
-        animation: 'fadeIn 1s ease-in-out forwards',
-        alignSelf: 'center',
-        minWidth: '700px',
-        width: '40vw',
-      };
-
-  const handleInputChange = (e) => {
+  /*const handleInputChange = (e) => {
     setLocation(e.target.value);
   };
 
@@ -183,89 +145,15 @@ function Home() {
       source.stop();
     }
     setIsPlaying(!isPlaying);
-  }
+  }*/
 
-  return (
-    <div>
-        <Header user={user} image={imageData ? true : false}/>
-        <div className="app">
-            {user && <h1 className= 'nav-links'>Hello {user}!</h1>}
-            <img style={moveStyle} src="./logo.png" alt="Logo"/>
-            <h1 className="fade-in-element" style={{
-                fontSize: '1.5rem',
-                }}>Study In Your Happy Place</h1>
-            <form onSubmit={handleGenerate} className="input-form">
-                <input
-                    type="text"
-                    value={location}
-                    onChange={handleInputChange}
-                    placeholder="Describe a location..."
-                    className="input-field"
-                    style={{
-                    minHeight: '4vw',
-                    width: '50vw',
-                    }}
-                />
-                <button type="submit" className="submit-button" disabled={loading} style={{
-                      minHeight: '4vw',
-                      width: '12vw',
-                    }}>
-                    {loading ? 'Generating...' : 'Generate Image'}
-                </button>
-            </form>
-        </div>
-
-      {error && <p className="error-message">{error}</p>}
-
-      {imageData && (
+    return (
         <div
             className="fullscreen-background"
             style={{ backgroundImage: `url(data:image/png;base64,${imageData})` }}
             >
-            <form className="secondinput-form" onSubmit={handleSubmit}>
-                <div className={`expandable-button ${isExpanded ? 'expanded' : ''}`}>
-                {isExpanded ? (
-                    <>
-                    <button type="button" className='expand-button' onClick={handleButtonClick} style={{color: '#5C3317'}}>X</button>
-                    <input
-                        type="text"
-                        value={location}
-                        onChange={handleInputChange}
-                        placeholder="Describe a location..."
-                        className="input-field"
-                        style={{
-                          minHeight: '4vw',
-                          width: '50vw',
-                          }}
-                    />
-                      <button type="submit" className="secondsubmit-button" disabled={loading} style={{
-                      minHeight: '4vw',
-                      width: '25vw',
-                    }}>
-                        {loading ? 'Generating...' : error ? 'Failed. Try Again!' : 'Generate New Image'}
-                    </button>
-                    </>
-                ) : (
-                    <button type="button" onClick={handleButtonClick} className="expand-button">
-                    Search
-                    </button>
-                )}
-                </div>
-              <button onClick={handleDownload} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
-                Download
-              </button>
-              <button onClick={handleUpload} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
-                Upload
-              </button>
-              <button onClick={playPause} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
-                {isPlaying ? 'Pause' : 'Play'}
-              </button>
-            </form>
         </div>
-      )}
-    </div>
-  );
-};
+      )
+}
 
-
-export default Home;
+export default GeneratedPage;
