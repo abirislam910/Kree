@@ -187,8 +187,6 @@ app.post('/api/generate-music', async (req, res) => {
       const supabase = createClient({ req, res })
       const {imageData} = req.body;
 
-      console.log(imageData);
-
       const { data: { user } } = await supabase.auth.getUser()
 
       console.log("GetUser called successfully");
@@ -198,21 +196,19 @@ app.post('/api/generate-music', async (req, res) => {
       }
 
       console.log("User found, proceeding with upload");
-      console.log("User ID: ", user.id);
 
-      const { list, listError } = await supabase
+      const { data: list, error: listError } = await supabase
         .storage
         .from('generated_images')
-        .list(user.id, {});
+        .list(user.id, {
+            search: 'image',
+        })
 
-      const count = list;
       if (listError) {
         console.error('Error listing images: ', listError);
       }
-      
-      console.log("Count: ", count);
 
-      const { data, dataError } = await supabase.storage.from('generated_images').upload(`${user.id}/image${count + 1}.png`, decode(imageData), {
+      const { error: uploadError } = await supabase.storage.from('generated_images').upload(`${user.id}/image${list.length + 1}.png`, decode(imageData), {
         contentType: 'image/png',
         cacheControl: '3600',
       });
@@ -220,9 +216,9 @@ app.post('/api/generate-music', async (req, res) => {
       console.log("Image uploaded successfully");
 
       res.sendStatus(200);
-    } catch (error) {
-      console.error('Error uploading image: ', error);
-      res.status(500).json({ message: 'Error uploading image: ', error });
+    } catch (uploadError) {
+      console.error('Error uploading image: ', uploadError);
+      res.status(500).json({ message: 'Error uploading image: ', uploadError });
     }
   });
 
