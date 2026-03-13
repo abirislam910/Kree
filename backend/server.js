@@ -3,7 +3,8 @@ const axios = require('axios');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const { createClient } = require("./lib/supabase.js")
+const { decode } = require('base64-arraybuffer');
+const { createClient } = require("./lib/supabase.js");
 
 dotenv.config();
 
@@ -162,8 +163,6 @@ app.post('/api/generate-music', async (req, res) => {
 
   app.post('/api/getuser', async (req, res) => { 
     try {
-      console.log('Cookies:', req.cookies);
-      
       const supabase = createClient({ req, res })
 
       const { data: { user } } = await supabase.auth.getUser()
@@ -174,11 +173,52 @@ app.post('/api/generate-music', async (req, res) => {
         return res.status(404).json({ message: 'User not found' });
       }
       else {
-      res.send(user.user_metadata.name);
+        console.log("User found");
+        res.send(user.user_metadata.name);
       }
     } catch (error) {
       console.error('Error retrieving user: ', error);
       res.status(500).json({ message: 'Error retrieving user: ', error });
+    }
+  });
+
+  app.post('/api/uploadimage', async (req, res) => { 
+    try {
+      const supabase = createClient({ req, res })
+      const {imageData} = req.body;
+
+      const { data: { user } } = await supabase.auth.getUser()
+
+      console.log("GetUser called successfully");
+      if (!user) {
+        console.log("User not found");
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      console.log("User found, proceeding with upload");
+
+      const { data: list, error: listError } = await supabase
+        .storage
+        .from('generated_images')
+        .list(user.id, {
+            search: 'image',
+        })
+
+      if (listError) {
+        console.error('Error listing images: ', listError);
+      }
+
+      const { error: uploadError } = await supabase.storage.from('generated_images').upload(`${user.id}/image${list.length + 1}.png`, decode(imageData), {
+        contentType: 'image/png',
+        cacheControl: '3600',
+      });
+
+      console.log("Image uploaded successfully");
+
+      res.sendStatus(200);
+    } catch (uploadError) {
+      console.error('Error uploading image: ', uploadError);
+      res.status(500).json({ message: 'Error uploading image: ', uploadError });
     }
   });
 
