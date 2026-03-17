@@ -32,7 +32,7 @@ app.use(cors({
     res.set('Access-Control-Allow-Credentials', 'true');
     res.status(200).send();
 });
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 
 console.log(ORIGIN);
 
