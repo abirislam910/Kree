@@ -30,7 +30,7 @@ function Signout() {
 
     return (
         <div>
-            <Header />
+            <Header user={user} />
             <div className="auth-container">
                 <div className="auth-card">
                     <h2 className="auth-title">Log Out</h2>

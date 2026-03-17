@@ -232,7 +232,7 @@ h1 {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 2rem;
+  font-size: 1.5rem;
   color: #faf7eb;
   opacity: 0.7;   
   padding: 0.5rem 0.75rem;
@@ -339,6 +339,7 @@ h1 {
   font-weight: 500;
   display: flex;
   gap: 2rem;
+  opacity: 0.7;
   animation: fadeIn 1.5s ease forwards;
 }
 
@@ -346,11 +347,12 @@ h1 {
   color: #faf7eb;
   text-decoration: none;
   font-weight: 500;
+  opacity: 0.7;
   transition: opacity 0.2s ease;
 }
 
 .nav-links-image a:hover {
-  opacity: 0.7;
+  opacity: 1;
 }
 
 
