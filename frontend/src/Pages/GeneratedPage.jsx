@@ -1,27 +1,61 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Header from './Header.jsx';
 import { UserContext } from './UserContext.jsx';
 import { ContentContext } from './ContentContext.jsx';
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { FaGear } from "react-icons/fa6";
 import '../App.css'
+import { useNavigate } from "react-router-dom";
+
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 function GeneratedPage() {
-  const navigate = useNavigate();
-  const { user, setUser } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const [message, setMessage] = useState("");
+  const [settingsVisible, setSettingsVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const [location, setLocation] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const navigate = useNavigate();
 
   const { imageData, setImageData, audioBuffer, setAudioBuffer } = useContext(ContentContext);
-  setImageData('');
-  setAudioBuffer(null);
 
-  /*const handleInputChange = (e) => {
+  useEffect(() => {
+  const handleBeforeUnload = (e) => {
+    e.preventDefault();
+    e.returnValue = '';
+  };
+
+  window.addEventListener('beforeunload', handleBeforeUnload);
+
+  return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
+  useEffect(() => {
+      const loadGeneration = async () => {
+        await audioContext.resume();
+        const source = audioContext.createBufferSource();
+        audioContext.decodeAudioData(audioBuffer, (decodedData) => {
+          source.buffer = decodedData;
+          source.connect(audioContext.destination);
+          source.loop = true;
+        source.start(0);
+      });
+      };
+      loadGeneration(); 
+  }, []);
+
+  useEffect(() => {
+    if (!imageData) {
+      navigate("/");
+    }
+  }, [imageData]);
+
+  const handleInputChange = (e) => {
     setLocation(e.target.value);
   };
 
@@ -35,7 +69,7 @@ function GeneratedPage() {
     setLoading(true);
     setError('');
     try {
-      const fullPrompt = "Ultra-detailed lofi anime-style illustration of a cozy interior scene inspired by " + location + ". Warm ambient lighting, golden hour glow, soft shadows, gentle depth of field. Aesthetic clutter: plants, books, textured fabrics, warm lamps, anything that fits the specified location:" + location + ". Calm, nostalgic, peaceful mood. Soft grain, muted but colorful palette.";
+      const fullPrompt = "Ultra-detailed lofi illustration of a cozy interior scene inspired by " + location + ". Warm ambient lighting, golden hour glow, soft shadows, gentle depth of field. Aesthetic clutter: plants, books, textured fabrics, warm lamps, anything that fits the specified location:" + location + ". Calm, nostalgic, peaceful mood. Soft grain, muted but colorful palette.";
 
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/generate-image`, {
         prompt: fullPrompt,
@@ -91,24 +125,11 @@ function GeneratedPage() {
     setIsExpanded(!isExpanded);
   };
 
-  const getUserData = async () => {
-    try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/getuser`, {}, { withCredentials: true });
-
-      setUser(response.data);
-    }
-    catch (err) {      
-      console.log('Error fetching user data:', err);
-    }
-  };
-
   const handleGenerate = (e) => {
     e.preventDefault();
     setLoading(true);
-    setImageData('iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAIAAADTED8xAAADMElEQVR4nOzVwQnAIBQFQYXff81RUkQCOyDj1YOPnbXWPmeTRef+/3O/OyBjzh3CD95BfqICMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMK0CMO0TAAD//2Anhf4QtqobAAAAAElFTkSuQmCC');
-    setAudioBuffer("haha");
-    //fetchImage();
-    //fetchMusic();
+    fetchImage();
+    fetchMusic();
   };
 
   const handleSubmit = (e) => {
@@ -145,14 +166,69 @@ function GeneratedPage() {
       source.stop();
     }
     setIsPlaying(!isPlaying);
-  }*/
+  }
+
+  const toggleSettings = () => {
+    setSettingsVisible(!settingsVisible);
+  }
 
     return (
+      <>
+        <Header user={user} image={imageData ? true : false} />
         <div
             className="fullscreen-background"
             style={{ backgroundImage: `url(data:image/png;base64,${imageData})` }}
             >
+              <div className="secondinput-form">
+                <button onClick={toggleSettings} className='expand-button' style={{marginBottom: '-4px'}}><FaGear /></button>
+                {settingsVisible && (
+                  <>
+                    <form onSubmit={handleGenerate}>
+                      <div className={`expandable-button ${isExpanded ? 'expanded' : ''}`}>
+                      {isExpanded ? (
+                          <>
+                          <button type="button" className='expand-button' onClick={handleButtonClick} style={{color: '#5C3317'}}>X</button>
+                          <input
+                              type="text"
+                              value={location}
+                              onChange={handleInputChange}
+                              placeholder="Describe a location..."
+                              className="input-field"
+                              style={{
+                                minHeight: '4vw',
+                                width: '50vw',
+                                }}
+                          />
+                            <button type="submit" className="secondsubmit-button" disabled={loading} style={{
+                            minHeight: '4vw',
+                            width: '25vw',
+                          }}>
+                              {loading ? 'Generating...' : error ? 'Failed. Try Again!' : 'Generate New Image'}
+                          </button>
+                          </>
+                      ) : (
+                          <button type="button" onClick={handleButtonClick} className="expand-button">
+                            <strong>Search</strong>
+                          </button>
+                      )}
+                      </div>
+                      </form>
+                    <button onClick={handleDownload} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
+                      <strong>Download</strong>
+                    </button>
+                    {user && (
+                      <button onClick={handleUpload} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
+                        <strong>Upload</strong>
+                      </button>
+                    )}
+                    <button onClick={playPause} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
+                      <strong>{isPlaying ? 'Pause' : 'Play'}</strong>
+                    </button>
+                  </>
+                )}
+              </div>
         </div>
+      </>
       )
 }
 
