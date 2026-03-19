@@ -3,11 +3,12 @@ import Header from './Header.jsx';
 import { UserContext } from './UserContext.jsx';
 import { ContentContext } from './ContentContext.jsx';
 import axios from "axios";
-import { FaGear } from "react-icons/fa6";
+import { FaGear, FaVolumeHigh, FaVolumeXmark } from "react-icons/fa6";
 import '../App.css'
 import { useNavigate } from "react-router-dom";
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const gainNode = audioContext.createGain();
 
 function GeneratedPage() {
   const { user } = useContext(UserContext);
@@ -16,11 +17,22 @@ function GeneratedPage() {
   const [loading, setLoading] = useState(false);
   const [location, setLocation] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(0);
   const [error, setError] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
 
   const { imageData, setImageData, audioBuffer, setAudioBuffer } = useContext(ContentContext);
+
+  useEffect(() => {
+    gainNode.connect(audioContext.destination);
+    gainNode.gain.setTargetAtTime(
+      volume,
+      audioContext.currentTime,
+      0.01
+    );
+    console.log('Volume changed to:', volume);
+  }, [volume]);
 
   useEffect(() => {
   const handleBeforeUnload = (e) => {
@@ -46,7 +58,35 @@ function GeneratedPage() {
         source.start(0);
       });
       };
-      loadGeneration(); 
+      //loadGeneration(); 
+
+      const myArrayBuffer = audioContext.createBuffer(
+        2,
+        audioContext.sampleRate * 3,
+        audioContext.sampleRate,
+      );
+
+      for (let channel = 0; channel < myArrayBuffer.numberOfChannels; channel++) {
+        // This gives us the actual ArrayBuffer that contains the data
+        const nowBuffering = myArrayBuffer.getChannelData(channel);
+        for (let i = 0; i < myArrayBuffer.length; i++) {
+          // Math.random() is in [0; 1.0]
+          // audio needs to be in [-1.0; 1.0]
+          nowBuffering[i] = Math.random() * 2 - 1;
+        }
+      }
+      const source = audioContext.createBufferSource();
+      // set the buffer in the AudioBufferSourceNode
+      source.buffer = myArrayBuffer;
+      // connect the AudioBufferSourceNode to the
+      // destination so we can hear the sound
+      setVolume(0.02);
+      source.loop = true;
+      gainNode.gain.value = volume;
+      source.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      source.start();
+      console.log("audio started");
   }, []);
 
   useEffect(() => {
@@ -157,15 +197,8 @@ function GeneratedPage() {
     }
   }
 
-  const playPause = () => {
-    const source = audioContext.createBufferSource();
-    if (!isPlaying) {
-      source.start();
-    } else {
-      source.start();
-      source.stop();
-    }
-    setIsPlaying(!isPlaying);
+  const handleVolumeChange = (e) => {
+    setVolume(e.target.value);
   }
 
   const toggleSettings = () => {
@@ -221,9 +254,16 @@ function GeneratedPage() {
                         <strong>Upload</strong>
                       </button>
                     )}
-                    <button onClick={playPause} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
-                      <strong>{isPlaying ? 'Pause' : 'Play'}</strong>
-                    </button>
+                    {volume == 0 ? (<FaVolumeXmark />):(<FaVolumeHigh />)}                    
+                    <input
+                      type="range"
+                      min="0"
+                      max="0.01"
+                      step="0.001"
+                      value={volume}
+                      onChange={handleVolumeChange}
+                      className="volume-slider"
+                    />
                   </>
                 )}
               </div>
