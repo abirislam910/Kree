@@ -248,6 +248,34 @@ h1 {
   outline: none;
 }
 
+.volume-slider {
+  width: 200px;
+  cursor: pointer;
+  appearance: none;
+  height: 6px;
+  border-radius: 5px;
+  background: #3C151C; /* your dark tone */
+  outline: none;
+}
+
+/* thumb */
+.volume-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #35BB8B; /* your accent */
+  cursor: pointer;
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #35BB8B;
+  cursor: pointer;
+}
+
 /* ---------- Feedback ---------- */
 
 .error-message {
