@@ -104,6 +104,10 @@ app.post('/api/generate-music', async (req, res) => {
   
     } catch (error) {
       console.error('Error generating task:', error);
+      console.error("STATUS:", error.response?.status);
+      console.error("HEADERS:", error.response?.headers);
+      console.error("MESSAGE:", error.response?.message);
+      console.error("DATA:", error.response?.data);
       res.status(500).json({ message: 'Error generating task: ', error });
     }
   });

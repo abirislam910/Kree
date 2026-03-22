@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const gainNode = audioContext.createGain();
+let source = audioContext.createBufferSource();
 
 function GeneratedPage() {
   const { user } = useContext(UserContext);
@@ -16,8 +17,8 @@ function GeneratedPage() {
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [location, setLocation] = useState('');
-  const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0);
+  const [volumeStore, setVolumeStore] = useState(0);
   const [error, setError] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
@@ -31,7 +32,18 @@ function GeneratedPage() {
       audioContext.currentTime,
       0.01
     );
-    console.log('Volume changed to:', volume);
+
+    const slider = document.getElementById("volume-slider");
+
+    const percent = volume * 2000;
+
+    slider.style.background = `linear-gradient(
+      to right,
+      white 0%,
+      white ${percent}%,
+      #3C151C ${percent}%,
+      #3C151C 100%
+    )`;
   }, [volume]);
 
   useEffect(() => {
@@ -50,43 +62,17 @@ function GeneratedPage() {
   useEffect(() => {
       const loadGeneration = async () => {
         await audioContext.resume();
-        const source = audioContext.createBufferSource();
         audioContext.decodeAudioData(audioBuffer, (decodedData) => {
           source.buffer = decodedData;
-          source.connect(audioContext.destination);
           source.loop = true;
-        source.start(0);
+          setVolume(0.05);
+          gainNode.gain.value = volume;
+          source.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+        source.start();
       });
       };
-      //loadGeneration(); 
-
-      const myArrayBuffer = audioContext.createBuffer(
-        2,
-        audioContext.sampleRate * 3,
-        audioContext.sampleRate,
-      );
-
-      for (let channel = 0; channel < myArrayBuffer.numberOfChannels; channel++) {
-        // This gives us the actual ArrayBuffer that contains the data
-        const nowBuffering = myArrayBuffer.getChannelData(channel);
-        for (let i = 0; i < myArrayBuffer.length; i++) {
-          // Math.random() is in [0; 1.0]
-          // audio needs to be in [-1.0; 1.0]
-          nowBuffering[i] = Math.random() * 2 - 1;
-        }
-      }
-      const source = audioContext.createBufferSource();
-      // set the buffer in the AudioBufferSourceNode
-      source.buffer = myArrayBuffer;
-      // connect the AudioBufferSourceNode to the
-      // destination so we can hear the sound
-      setVolume(0.02);
-      source.loop = true;
-      gainNode.gain.value = volume;
-      source.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      source.start();
-      console.log("audio started");
+      loadGeneration(); 
   }, []);
 
   useEffect(() => {
@@ -151,8 +137,23 @@ function GeneratedPage() {
         }
       );
 
-      const buffer = await audioContext.decodeAudioData(response.data);
-      setAudioBuffer(buffer);
+      //const buffer = await audioContext.decodeAudioData(response.data);
+      source.stop();
+      source.disconnect();
+
+      const newSource = audioContext.createBufferSource();
+
+      audioContext.decodeAudioData(response.data, (decodedData) => {
+          newSource.buffer = decodedData;
+          newSource.loop = true;
+          setVolume(0.05);
+          gainNode.gain.value = volume;
+          newSource.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+        newSource.start();
+      });
+      source = newSource;
+      setAudioBuffer(response.data);
     }
     catch (err) {
       setError('Failed to generate music. Please try again.');
@@ -165,11 +166,12 @@ function GeneratedPage() {
     setIsExpanded(!isExpanded);
   };
 
-  const handleGenerate = (e) => {
+  const handleGenerate = async (e) => {
     e.preventDefault();
     setLoading(true);
-    fetchImage();
-    fetchMusic();
+    await fetchImage();
+    await fetchMusic();
+    setLoading(false);
   };
 
   const handleSubmit = (e) => {
@@ -199,10 +201,29 @@ function GeneratedPage() {
 
   const handleVolumeChange = (e) => {
     setVolume(e.target.value);
+    if (e.target.value == 0) {
+      setVolumeStore(e.target.value);
+    }
+  }
+
+  const handleMute = () => {
+    if (volume > 0) {
+      setVolumeStore(volume);
+      setVolume(0);
+    } else {
+      setVolume(volumeStore);
+    }
   }
 
   const toggleSettings = () => {
     setSettingsVisible(!settingsVisible);
+    const button = document.getElementById("settings-button");
+
+    button.className = 'gear-rotation';
+
+    setTimeout(() => {
+      button.className = '';
+    }, 500);
   }
 
     return (
@@ -213,9 +234,12 @@ function GeneratedPage() {
             style={{ backgroundImage: `url(data:image/png;base64,${imageData})` }}
             >
               <div className="secondinput-form">
-                <button onClick={toggleSettings} className='expand-button' style={{marginBottom: '-4px'}}><FaGear /></button>
-                {settingsVisible && (
-                  <>
+                <button onClick={toggleSettings} className='expand-button'>
+                  <div id='settings-button' style={{height: '24px'}}>
+                    <FaGear />
+                  </div>
+                </button>
+                  <div style={{visibility: settingsVisible ? 'visible':'hidden', marginBottom: '-3px', display: 'flex'}}>
                     <form onSubmit={handleGenerate}>
                       <div className={`expandable-button ${isExpanded ? 'expanded' : ''}`}>
                       {isExpanded ? (
@@ -254,19 +278,21 @@ function GeneratedPage() {
                         <strong>Upload</strong>
                       </button>
                     )}
-                    {volume == 0 ? (<FaVolumeXmark />):(<FaVolumeHigh />)}                    
+                    <button onClick={handleMute} className='expand-button' style={{marginBottom: '-2px', display: isExpanded ? "none" : "block"}}> {volume == 0 ? (<FaVolumeXmark />): (<FaVolumeHigh />)}</button>
                     <input
                       type="range"
                       min="0"
-                      max="0.01"
-                      step="0.001"
+                      max="0.05"
+                      step="any"
                       value={volume}
                       onChange={handleVolumeChange}
                       className="volume-slider"
+                      style={{ display: isExpanded ? "none" : "block"}}
+                      id="volume-slider"
                     />
-                  </>
-                )}
+                  <div/>
               </div>
+            </div>
         </div>
       </>
       )
