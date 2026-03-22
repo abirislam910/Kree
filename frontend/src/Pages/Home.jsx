@@ -2,21 +2,18 @@ import React, {useState, useEffect, useContext} from 'react';
 import axios from 'axios';
 import Header from './Header.jsx';
 import { UserContext }  from './UserContext.jsx';
+import { ContentContext } from './ContentContext.jsx';
+import { useNavigate } from "react-router-dom";
 import '../App.css';
 
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
 function Home() {
-
   const [location, setLocation] = useState('');
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [imageData, setImageData] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { user, setUser } = useContext(UserContext);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const { imageData, setImageData, audioBuffer, setAudioBuffer } = useContext(ContentContext);
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [audioBuffer, setAudioBuffer] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
         getUserData();
@@ -24,11 +21,7 @@ function Home() {
 
   useEffect(() => {
     if (imageData && audioBuffer) {
-      const source = audioContext.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(audioContext.destination);
-      source.loop = true;
-      source.start(0);
+      navigate('/generated');
     }
   }, [imageData, audioBuffer]);
 
@@ -68,7 +61,7 @@ function Home() {
     setLoading(true);
     setError('');
     try {
-      const fullPrompt = "Ultra-detailed lofi anime-style illustration of a cozy interior scene inspired by " + location + ". Warm ambient lighting, golden hour glow, soft shadows, gentle depth of field. Aesthetic clutter: plants, books, textured fabrics, warm lamps, anything that fits the specified location:" + location + ". Calm, nostalgic, peaceful mood. Soft grain, muted but colorful palette.";
+      const fullPrompt = "Cartoonish, lo-fi illustration of a cozy interior scene inspired by " + location + ". Warm ambient lighting, golden hour glow, soft shadows, gentle depth of field. Aesthetic clutter: plants, books, textured fabrics, warm lamps, anything that fits the specified location:" + location + ". Calm, nostalgic, peaceful mood. Soft grain, muted but colorful palette.";
 
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/generate-image`, {
         prompt: fullPrompt,
@@ -99,8 +92,6 @@ function Home() {
     try {
       const fullPrompt = "Chill lo-fi instrumental track, 70-85 BPM. Warm vinyl texture, soft tape saturation, subtle crackle. Instruments inspired by" + location + ". Dreamy electric piano chords, mellow bassline, soft boom-bap drums"
 
-      await audioContext.resume();
-
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/generate-music`, 
         {
           prompt: fullPrompt,
@@ -110,18 +101,13 @@ function Home() {
         }
       );
 
-      const buffer = await audioContext.decodeAudioData(response.data);
-      setAudioBuffer(buffer);
+      setAudioBuffer(response.data);
     }
     catch (err) {
       setError('Failed to generate music. Please try again.');
       console.log(err);
       setLoading(false);
     }
-  };
-  
-  const handleButtonClick = () => {
-    setIsExpanded(!isExpanded);
   };
 
   const getUserData = async () => {
@@ -141,42 +127,6 @@ function Home() {
     fetchImage();
     fetchMusic();
   };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  }
-
-  const handleDownload = () => {
-    if (!imageData) return;
-
-    const link = document.createElement('a');
-    link.href = `data:image/png;base64,${imageData}`;
-    link.download = 'generated-image.png';
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const handleUpload = async () => {
-    try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/uploadimage`, { imageData: imageData }, { withCredentials: true });
-      console.log('Upload successful');
-    } catch (err) {
-      console.error('Error uploading image:', err);
-    }
-  }
-
-  const playPause = () => {
-    const source = audioContext.createBufferSource();
-    if (!isPlaying) {
-      source.start();
-    } else {
-      source.start();
-      source.stop();
-    }
-    setIsPlaying(!isPlaying);
-  }
 
   return (
     <div>
@@ -206,56 +156,8 @@ function Home() {
                     {loading ? 'Generating...' : 'Generate Image'}
                 </button>
             </form>
+            {error && <p className="error-message">{error}</p>}
         </div>
-
-      {error && <p className="error-message">{error}</p>}
-
-      {imageData && (
-        <div
-            className="fullscreen-background"
-            style={{ backgroundImage: `url(data:image/png;base64,${imageData})` }}
-            >
-            <form className="secondinput-form" onSubmit={handleSubmit}>
-                <div className={`expandable-button ${isExpanded ? 'expanded' : ''}`}>
-                {isExpanded ? (
-                    <>
-                    <button type="button" className='expand-button' onClick={handleButtonClick} style={{color: '#5C3317'}}>X</button>
-                    <input
-                        type="text"
-                        value={location}
-                        onChange={handleInputChange}
-                        placeholder="Describe a location..."
-                        className="input-field"
-                        style={{
-                          minHeight: '4vw',
-                          width: '50vw',
-                          }}
-                    />
-                      <button type="submit" className="secondsubmit-button" disabled={loading} style={{
-                      minHeight: '4vw',
-                      width: '25vw',
-                    }}>
-                        {loading ? 'Generating...' : error ? 'Failed. Try Again!' : 'Generate New Image'}
-                    </button>
-                    </>
-                ) : (
-                    <button type="button" onClick={handleButtonClick} className="expand-button">
-                    Search
-                    </button>
-                )}
-                </div>
-              <button onClick={handleDownload} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
-                Download
-              </button>
-              <button onClick={handleUpload} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
-                Upload
-              </button>
-              <button onClick={playPause} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
-                {isPlaying ? 'Pause' : 'Play'}
-              </button>
-            </form>
-        </div>
-      )}
     </div>
   );
 };
