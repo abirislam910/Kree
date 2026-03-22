@@ -215,7 +215,6 @@ h1 {
   justify-content: center;
   align-items: center;
   border-radius: 20px;
-  transition: all 0.3s ease;
 }
 
 .expandable-button.expanded {
@@ -226,18 +225,23 @@ h1 {
   border-radius: 25px;
   background: #faf7eb;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease-out;
 }
 
 .expand-button {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 2rem;
+  font-size: 1.5rem;
   color: #faf7eb;
   opacity: 0.7;   
-  padding: 0.5rem 0.75rem;
+  margin: 0.5rem 0.75rem;
   text-decoration: none;
   transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.gear-rotation {
+  animation: rotate 0.5s linear;
 }
 
 .expand-button:hover {
@@ -246,6 +250,38 @@ h1 {
 
 .expand-button:focus {
   outline: none;
+}
+
+.volume-slider {
+  width: 20vw;
+  cursor: pointer;
+  appearance: none;
+  height: 8px;
+  border-radius: 5px;
+  margin-bottom: 14px;
+  align-self: flex-end;
+  outline: none;
+}
+
+/* thumb */
+.volume-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #35BB8B;
+  cursor: pointer;
+}
+.volume-slider::-webkit-slider-thumb:hover {
+  background: #37CB72;
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #35BB8B;
+  cursor: pointer;
 }
 
 /* ---------- Feedback ---------- */
@@ -339,6 +375,7 @@ h1 {
   font-weight: 500;
   display: flex;
   gap: 2rem;
+  opacity: 0.7;
   animation: fadeIn 1.5s ease forwards;
 }
 
@@ -346,11 +383,12 @@ h1 {
   color: #faf7eb;
   text-decoration: none;
   font-weight: 500;
+  opacity: 0.7;
   transition: opacity 0.2s ease;
 }
 
 .nav-links-image a:hover {
-  opacity: 0.7;
+  opacity: 1;
 }
 
 
@@ -359,4 +397,9 @@ h1 {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(180deg); }
 }

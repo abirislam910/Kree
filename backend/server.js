@@ -32,7 +32,7 @@ app.use(cors({
     res.set('Access-Control-Allow-Credentials', 'true');
     res.status(200).send();
 });
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 
 console.log(ORIGIN);
 
@@ -104,6 +104,10 @@ app.post('/api/generate-music', async (req, res) => {
   
     } catch (error) {
       console.error('Error generating task:', error);
+      console.error("STATUS:", error.response?.status);
+      console.error("HEADERS:", error.response?.headers);
+      console.error("MESSAGE:", error.response?.message);
+      console.error("DATA:", error.response?.data);
       res.status(500).json({ message: 'Error generating task: ', error });
     }
   });
