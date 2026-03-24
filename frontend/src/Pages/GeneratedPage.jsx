@@ -16,14 +16,13 @@ function GeneratedPage() {
   const [message, setMessage] = useState("");
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [location, setLocation] = useState('');
   const [volume, setVolume] = useState(0);
   const [volumeStore, setVolumeStore] = useState(0);
   const [error, setError] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
 
-  const { imageData, setImageData, audioBuffer, setAudioBuffer } = useContext(ContentContext);
+  const { imageData, setImageData, audioBuffer, setAudioBuffer, location, setLocation } = useContext(ContentContext);
 
   useEffect(() => {
     gainNode.connect(audioContext.destination);
@@ -169,8 +168,7 @@ function GeneratedPage() {
   const handleGenerate = async (e) => {
     e.preventDefault();
     setLoading(true);
-    await fetchImage();
-    await fetchMusic();
+    await Promise.all([fetchImage(), fetchMusic()]);
     setLoading(false);
   };
 
@@ -192,7 +190,7 @@ function GeneratedPage() {
 
   const handleUpload = async () => {
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/uploadimage`, { imageData: imageData }, { withCredentials: true });
+      await axios.post(`${process.env.REACT_APP_API_URL}/uploadimage`, { imageData: imageData, prompt: prompt }, { withCredentials: true });
       console.log('Upload successful');
     } catch (err) {
       console.error('Error uploading image:', err);
