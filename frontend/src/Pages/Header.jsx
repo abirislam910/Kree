@@ -10,7 +10,7 @@ function Header(props) {
     <div className="header">
       <Hamburger toggled={isOpen} toggle={setOpen} color={props.image ? '#faf7eb' : '#35BB8B'}/>
       <nav className={props.image ? "nav-links-image" : "nav-links"}>
-        {isOpen && window.location.pathname !== '/' && window.location.pathname !== '/generated' && 
+        {isOpen && window.location.pathname !== '/' && 
           <Link to="/">
             <strong>Home</strong>
           </Link>
@@ -23,6 +23,11 @@ function Header(props) {
         {isOpen && window.location.pathname !== '/signout' && props.user &&
             <Link to="/signout">
               <strong>Sign Out</strong>
+            </Link>
+        }
+        {isOpen && window.location.pathname !== '/collection' && props.user &&
+            <Link to="/collection">
+              <strong>Collection</strong>
             </Link>
         }
         {isOpen && window.location.pathname !== '/registration' && !props.user &&
