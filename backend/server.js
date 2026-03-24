@@ -189,7 +189,7 @@ app.post('/api/generate-music', async (req, res) => {
   app.post('/api/uploadimage', async (req, res) => { 
     try {
       const supabase = createClient({ req, res })
-      const {imageData} = req.body;
+      const {imageData, prompt} = req.body;
 
       const { data: { user } } = await supabase.auth.getUser()
 
@@ -215,6 +215,7 @@ app.post('/api/generate-music', async (req, res) => {
       const { error: uploadError } = await supabase.storage.from('generated_images').upload(`${user.id}/image${list.length + 1}.png`, decode(imageData), {
         contentType: 'image/png',
         cacheControl: '3600',
+        metadata: {'prompt': prompt},
       });
 
       console.log("Image uploaded successfully");
