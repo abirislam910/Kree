@@ -5,7 +5,7 @@ export const ContentContext = createContext();
 export function ContentProvider({ children }) {
   const [imageData, setImageData] = useState(null);
   const [audioBuffer, setAudioBuffer] = useState(null);
-  const [location, setLocation] = useState(null);
+  const [location, setLocation] = useState("");
 
   return (
     <ContentContext.Provider value={{ imageData, setImageData, audioBuffer, setAudioBuffer, location, setLocation }}>

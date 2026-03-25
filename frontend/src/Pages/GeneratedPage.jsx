@@ -190,10 +190,20 @@ function GeneratedPage() {
 
   const handleUpload = async () => {
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/uploadimage`, { imageData: imageData, prompt: prompt }, { withCredentials: true });
+      await axios.post(`${process.env.REACT_APP_API_URL}/uploadimage`, { imageData: imageData, location: location }, { withCredentials: true });
       console.log('Upload successful');
     } catch (err) {
       console.error('Error uploading image:', err);
+    }
+  }
+
+  const handleCollection = async () => {
+    try {
+      const collection = await axios.post(`${process.env.REACT_APP_API_URL}/getcollection`, {}, { withCredentials: true });
+      console.log('Collection successful');
+      console.log(collection.data);
+    } catch (err) {
+      console.error('Error collecting images:', err);
     }
   }
 
@@ -272,10 +282,16 @@ function GeneratedPage() {
                       <strong>Download</strong>
                     </button>
                     {user && (
+                      <>
                       <button onClick={handleUpload} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
                         <strong>Upload</strong>
                       </button>
+                      <button onClick={handleCollection} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
+                        <strong>Collection</strong>
+                      </button>
+                      </>
                     )}
+
                     <button onClick={handleMute} className='expand-button' style={{marginBottom: '-2px', display: isExpanded ? "none" : "block"}}> {volume == 0 ? (<FaVolumeXmark />): (<FaVolumeHigh />)}</button>
                     <input
                       type="range"
