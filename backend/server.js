@@ -189,7 +189,7 @@ app.post('/api/generate-music', async (req, res) => {
   app.post('/api/uploadimage', async (req, res) => { 
     try {
       const supabase = createClient({ req, res })
-      const {imageData, prompt} = req.body;
+      const {imageData, location} = req.body;
 
       const { data: { user } } = await supabase.auth.getUser()
 
@@ -215,7 +215,7 @@ app.post('/api/generate-music', async (req, res) => {
       const { error: uploadError } = await supabase.storage.from('generated_images').upload(`${user.id}/image${list.length + 1}.png`, decode(imageData), {
         contentType: 'image/png',
         cacheControl: '3600',
-        metadata: {'prompt': prompt},
+        metadata: {'location': location},
       });
 
       console.log("Image uploaded successfully");
@@ -224,6 +224,49 @@ app.post('/api/generate-music', async (req, res) => {
     } catch (uploadError) {
       console.error('Error uploading image: ', uploadError);
       res.status(500).json({ message: 'Error uploading image: ', uploadError });
+    }
+  });
+
+  app.post('/api/getcollection', async (req, res) => { 
+    try {
+      const supabase = createClient({ req, res })
+
+      const { data: { user } } = await supabase.auth.getUser()
+
+      console.log("GetUser called successfully");
+      if (!user) {
+        console.log("User not found");
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      console.log("User found, proceeding with download");
+
+      const { data: list, error: listError } = await supabase
+        .storage
+        .from('generated_images')
+        .list(user.id, {
+            search: 'image',
+        })
+
+      if (listError) {
+        console.error('Error listing images: ', listError);
+      }
+
+      const collection = [];
+
+      for (const item of list) {
+        const { data, error } = await supabase.storage
+          .from('generated_images')
+          .info(`${user.id}/${item.name}`);
+
+        collection.push({ location: data.metadata.location, name: item.name });
+      }
+
+      console.log(collection);
+      res.status(200).send(collection);
+    } catch (error) {
+      console.error('Error retrieving collection: ', error);
+      res.status(500).json({ message: 'Error retrieving collection: ', error });
     }
   });
 
