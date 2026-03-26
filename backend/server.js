@@ -262,7 +262,6 @@ app.post('/api/generate-music', async (req, res) => {
         collection.push({ location: data.metadata.location, name: item.name });
       }
 
-      console.log(collection);
       res.status(200).send(collection);
     } catch (error) {
       console.error('Error retrieving collection: ', error);
