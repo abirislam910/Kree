@@ -25,11 +25,6 @@ function Header(props) {
               <strong>Sign Out</strong>
             </Link>
         }
-        {isOpen && window.location.pathname !== '/collection' && props.user &&
-            <Link to="/collection">
-              <strong>Collection</strong>
-            </Link>
-        }
         {isOpen && window.location.pathname !== '/registration' && !props.user &&
           <Link to="/registration">
             <strong>Register</strong>
