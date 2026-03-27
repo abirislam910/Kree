@@ -197,16 +197,6 @@ function GeneratedPage() {
     }
   }
 
-  const handleCollection = async () => {
-    try {
-      const collection = await axios.post(`${process.env.REACT_APP_API_URL}/getcollection`, {}, { withCredentials: true });
-      console.log('Collection successful');
-      console.log(collection.data);
-    } catch (err) {
-      console.error('Error collecting images:', err);
-    }
-  }
-
   const handleVolumeChange = (e) => {
     setVolume(e.target.value);
     if (e.target.value == 0) {
@@ -285,9 +275,6 @@ function GeneratedPage() {
                       <>
                       <button onClick={handleUpload} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
                         <strong>Upload</strong>
-                      </button>
-                      <button onClick={handleCollection} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
-                        <strong>Collection</strong>
                       </button>
                       </>
                     )}
