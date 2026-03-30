@@ -46,8 +46,8 @@ function Login() {
             <div className="auth-container">
                 <div className="auth-card">
                     <h2 className="auth-title">Log In</h2>
-                    {!message && <p className="auth-subtitle">Welcome Back!</p>}
-                    {message && <p className="auth-subtitle" style={{color: 'red'}}><strong>{message}</strong></p>}
+                    {!message && <p className="subtitle">Welcome Back!</p>}
+                    {message && <p className="subtitle" style={{color: 'red'}}><strong>{message}</strong></p>}
                     <form onSubmit={handleSubmit} className="auth-form">
                     <input
                         onChange={(e) => setEmail(e.target.value)}

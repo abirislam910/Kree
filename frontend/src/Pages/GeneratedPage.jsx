@@ -34,7 +34,7 @@ function GeneratedPage() {
 
     const slider = document.getElementById("volume-slider");
 
-    const percent = volume * 2000;
+    const percent = volume * 1000;
 
     slider.style.background = `linear-gradient(
       to right,
@@ -61,10 +61,11 @@ function GeneratedPage() {
   useEffect(() => {
       const loadGeneration = async () => {
         await audioContext.resume();
-        audioContext.decodeAudioData(audioBuffer, (decodedData) => {
+        const audioCopy = audioBuffer.slice(0);
+        audioContext.decodeAudioData(audioCopy, (decodedData) => {
           source.buffer = decodedData;
           source.loop = true;
-          setVolume(0.05);
+          setVolume(0.1);
           gainNode.gain.value = volume;
           source.connect(gainNode);
           gainNode.connect(audioContext.destination);
@@ -145,7 +146,7 @@ function GeneratedPage() {
       audioContext.decodeAudioData(response.data, (decodedData) => {
           newSource.buffer = decodedData;
           newSource.loop = true;
-          setVolume(0.05);
+          setVolume(0.1);
           gainNode.gain.value = volume;
           newSource.connect(gainNode);
           gainNode.connect(audioContext.destination);
@@ -190,10 +191,19 @@ function GeneratedPage() {
 
   const handleUpload = async () => {
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/uploadimage`, { imageData: imageData, location: location }, { withCredentials: true });
+      console.log("Audio Buffer: ", audioBuffer);
+      
+      var fd = new FormData();
+      fd.append('audioData', new Blob([audioBuffer], { type: 'audio/mpeg' }), 'audio.mp3');
+
+      const imageUpload = async () => {await axios.post(`${process.env.REACT_APP_API_URL}/uploadimage`, { imageData: imageData, location: location }, { withCredentials: true })};
+      const audioUpload = async () => {await axios.post(`${process.env.REACT_APP_API_URL}/uploadaudio`, fd, { withCredentials: true })};
+
+      await Promise.all([imageUpload(), audioUpload()]);
+
       console.log('Upload successful');
     } catch (err) {
-      console.error('Error uploading image:', err);
+      console.error('Error uploading:', err);
     }
   }
 
@@ -283,7 +293,7 @@ function GeneratedPage() {
                     <input
                       type="range"
                       min="0"
-                      max="0.05"
+                      max="0.1"
                       step="any"
                       value={volume}
                       onChange={handleVolumeChange}

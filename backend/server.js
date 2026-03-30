@@ -1,9 +1,12 @@
 const express = require('express');
 const axios = require('axios');
 const dotenv = require('dotenv');
+const multer  = require('multer')
+const storage = multer.memoryStorage()
+const upload = multer({ storage: storage })
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const { decode } = require('base64-arraybuffer');
+const { decode, encode } = require('base64-arraybuffer');
 const { createClient } = require("./lib/supabase.js");
 
 dotenv.config();
@@ -33,8 +36,6 @@ app.use(cors({
     res.status(200).send();
 });
 app.use(express.json({ limit: '50mb' }));
-
-console.log(ORIGIN);
 
 app.post('/api/generate-image', async (req, res) => {
     const { prompt } = req.body;
@@ -95,9 +96,6 @@ app.post('/api/generate-music', async (req, res) => {
           responseType: 'arraybuffer',
         }
       );
-
-      console.log(generate_response);
-      console.log(generate_response.data);
 
       res.setHeader('Content-Type', 'audio/mpeg');
       res.send(Buffer.from(generate_response.data));
@@ -212,18 +210,123 @@ app.post('/api/generate-music', async (req, res) => {
         console.error('Error listing images: ', listError);
       }
 
-      const { error: uploadError } = await supabase.storage.from('generated_images').upload(`${user.id}/image${list.length + 1}.png`, decode(imageData), {
+      const { error: imageError } = await supabase.storage.from('generated_images').upload(`${user.id}/image${list.length + 1}.png`, decode(imageData), {
         contentType: 'image/png',
         cacheControl: '3600',
         metadata: {'location': location},
       });
-
+      
       console.log("Image uploaded successfully");
 
       res.sendStatus(200);
-    } catch (uploadError) {
-      console.error('Error uploading image: ', uploadError);
-      res.status(500).json({ message: 'Error uploading image: ', uploadError });
+      } catch (uploadError) {
+        console.error('Error uploading image: ', uploadError);
+        res.status(500).json({ message: 'Error uploading image: ', uploadError });
+    }
+  });
+
+  app.post('/api/uploadaudio', upload.single('audioData'), async (req, res) => { 
+    try {
+      const supabase = createClient({ req, res })
+      const audioData = req.file.buffer;
+
+      console.log("Audio Data Received: ", audioData);
+
+      const { data: { user } } = await supabase.auth.getUser()
+
+      console.log("GetUser called successfully");
+      if (!user) {
+        console.log("User not found");
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      console.log("User found, proceeding with upload");
+
+      const { data: list, error: listError } = await supabase
+        .storage
+        .from('generated_audio')
+        .list(user.id, {
+            search: 'audio',
+        })
+
+      if (listError) {
+        console.error('Error listing audio: ', listError);
+      }
+
+      console.log("Audio Data: ", audioData);
+
+      const { error: audioError } = await supabase.storage.from('generated_audio').upload(`${user.id}/audio${list.length + 1}.mp3`, audioData, {
+        contentType: 'audio/mpeg',
+        cacheControl: '3600',
+      });
+
+      console.log("Audio uploaded successfully");
+
+      res.sendStatus(200);
+      } catch (uploadError) {
+        console.error('Error uploading audio: ', uploadError);
+        res.status(500).json({ message: 'Error uploading audio: ', uploadError });
+    }
+  });
+
+  app.post('/api/getcollection', async (req, res) => { 
+    try {
+      const supabase = createClient({ req, res })
+
+      const { data: { user } } = await supabase.auth.getUser()
+
+      console.log("GetUser called successfully");
+      if (!user) {
+        console.log("User not found");
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      console.log("User found, proceeding with download");
+
+      const { data: list, error: listError } = await supabase
+        .storage
+        .from('generated_images')
+        .list(user.id, {
+            search: 'image',
+        })
+
+      if (listError) {
+        console.error('Error listing images: ', listError);
+      }
+
+      const collection = [];
+
+      for (const item of list) {
+        const name = item.name
+        console.log("Processing item: ", name);
+
+        const { data: location, error: locationError } = await supabase.storage
+          .from('generated_images')
+          .info(`${user.id}/${item.name}`);
+
+        const { data: imageURL } = supabase
+          .storage
+          .from('generated_images')
+          .getPublicUrl(`${user.id}/image${name.charAt(5)}.png`, {
+          })
+
+        const { data: audioURL } = supabase
+          .storage
+          .from('generated_audio')
+          .getPublicUrl(`${user.id}/audio${name.charAt(5)}.mp3`, {
+          })
+
+        const imageData = await axios.get(imageURL.publicUrl, {responseType: 'arraybuffer'});
+
+        const base64Image = encode(imageData.data);
+
+        collection.push({ location: location.metadata.location, audioUrl: audioURL.publicUrl, base64: base64Image });
+      }
+
+      res.status(200).send(collection);
+    } catch (error) {
+      console.error('Error retrieving collection: ', error);
+      res.status(500).json({ message: 'Error retrieving collection: ', error });
     }
   });
 

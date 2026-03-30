@@ -1,0 +1,79 @@
+import React, { useState, useEffect, useContext } from "react";
+import Header from './Header.jsx';
+import { UserContext } from './UserContext.jsx';
+import { useNavigate } from "react-router-dom";
+import { FaDownload } from "react-icons/fa6";
+import { ContentContext } from './ContentContext.jsx';
+import axios from "axios";
+import '../App.css'
+
+function Collection() {
+    const navigate = useNavigate();
+    const { user, setUser } = useContext(UserContext);
+    const [collection, setCollection] = useState([]);
+    const [message, setMessage] = useState("Loading collection...");
+
+    const { imageData, setImageData, audioBuffer, setAudioBuffer, location, setLocation } = useContext(ContentContext);
+
+    useEffect(() => {
+        async function getCollection() {
+
+            const collection = await axios.post(`${process.env.REACT_APP_API_URL}/getcollection`, {}, { withCredentials: true });
+            
+            if (!collection.data || collection.data.length === 0) {
+                setMessage("No items in collection");
+            } else {
+                setMessage("");
+                setCollection(collection.data);
+            }
+        };
+
+        getCollection();
+    }, []);
+
+    useEffect(() => {
+        getUserData();
+    }, []);
+
+    const getUserData = async () => {
+        try {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/getuser`, {}, { withCredentials: true });
+
+        setUser(response.data);
+        }
+        catch (err) {      
+        console.log('Error fetching user data:', err);
+        }
+    };
+
+    const selectImage = async (e) => {
+        setLocation(collection[e.currentTarget.id].location);
+        setImageData(collection[e.currentTarget.id].base64);
+
+        const audioData = await axios.get(collection[e.currentTarget.id].audioUrl, { responseType: 'arraybuffer' });
+        setAudioBuffer(audioData.data);
+
+        navigate('/generated');
+    }
+
+    return (
+        <div>
+            <Header user={user} />
+            <div className="collection-container">
+                <h1 className="subtitle" style={{color: 'black', justifyContent: 'center'}}>{message}</h1>
+                {collection.map((item, index) => (
+                    <div id={index} key={index} className="collection-card" onClick={selectImage} style={{ animationDelay: `${index * 0.15}s`, cursor: 'pointer' }}>
+                        <img src={`data:image/png;base64,${item.base64}`} alt={item.location} className="collection-image"/>
+                        <hr style={{borderTop: '2px solid white', borderRadius: '5px', margin: '1rem'}}/>
+                        <div style={{display: 'flex', flexDirection: 'row'}}>
+                            <FaDownload style={{margin: '1rem'}}/>
+                            <p style={{margin: '1rem'}}>{item.location}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+export default Collection;

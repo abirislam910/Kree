@@ -11,6 +11,12 @@ html, body, #root {
   background-color: #faf7eb;
 }
 
+.subtitle {
+  font-size: 0.95rem;
+  color: #faf7eb;
+  margin-bottom: 2rem;
+}
+
 .auth-container {
   height: 100vh;
   display: flex;
@@ -34,12 +40,6 @@ html, body, #root {
   font-size: 2rem;
   color: #faf7eb;
   margin-bottom: 0.5rem;
-}
-
-.auth-subtitle {
-  font-size: 0.95rem;
-  color: #faf7eb;
-  margin-bottom: 2rem;
 }
 
 /* ===== Form ===== */
@@ -344,6 +344,7 @@ h1 {
   align-items: center;
   justify-content:flex-start;
   padding: 0 1.5rem;
+  background-color: #faf7eb;
   z-index: 1000;
 }
 
@@ -390,6 +391,40 @@ h1 {
 .nav-links-image a:hover {
   opacity: 1;
 }
+
+/* ---------- Collection ---------- */
+
+.collection-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 2rem;
+  margin: 5rem auto 0 auto;
+  max-width: 80vw;
+}
+
+.collection-card {
+  background: #7B3F00;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  color: #faf7eb;
+  font-size: 1.75rem;
+  opacity: 0;
+  max-width: 80vw;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.collection-card:hover {
+  background: #35BB8B;
+  transition: 0.5s ease;
+}
+
+.collection-image {
+  max-width: 70vw;
+  border-radius: 8px;
+  margin: 1rem;
+}
+
 
 
 /* ---------- Animation ---------- */
