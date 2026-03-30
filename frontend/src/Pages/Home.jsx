@@ -120,11 +120,10 @@ function Home() {
     }
   };
 
-  const handleGenerate = (e) => {
+  const handleGenerate = async (e) => {
     e.preventDefault();
     setLoading(true);
-    fetchImage();
-    fetchMusic();
+    await Promise.all([fetchImage(), fetchMusic()]);
   };
 
   return (

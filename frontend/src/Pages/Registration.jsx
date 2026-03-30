@@ -43,8 +43,8 @@ function Registration() {
         <div className="auth-container">
             <div className="auth-card">
                 <h2 className="auth-title">Register</h2>
-                {!message && <p className="auth-subtitle">Welcome to Kree!</p>}
-                {message && <p className="auth-subtitle" style={{color: message === "Please check your email for a confirmation link" ? 'white':'red'}}>{message}</p>}
+                {!message && <p className="subtitle">Welcome to Kree!</p>}
+                {message && <p className="subtitle" style={{color: message === "Please check your email for a confirmation link" ? 'white':'red'}}>{message}</p>}
                 <form onSubmit={handleSubmit} className="auth-form">
                     <input
                     onChange={(e) => setEmail(e.target.value)}

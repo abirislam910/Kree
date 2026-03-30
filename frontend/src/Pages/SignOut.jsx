@@ -34,7 +34,7 @@ function Signout() {
             <div className="auth-container">
                 <div className="auth-card">
                     <h2 className="auth-title">Log Out</h2>
-                    <p className="auth-subtitle">See you soon!</p>
+                    <p className="subtitle">See you soon!</p>
                     {message && <span className="auth-subtitle">{message}</span>}
                     <button onClick={handleSubmit} className="auth-button" style={{
                         opacity: loading ? 0.7 : 1,

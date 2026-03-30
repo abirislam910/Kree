@@ -3,6 +3,7 @@
 # Node.js backend
 backend/node_modules/
 backend/.env
+backend/uploads/
 
 # React frontend
 frontend/node_modules/
