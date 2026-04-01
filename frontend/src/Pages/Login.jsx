@@ -28,7 +28,6 @@ function Login() {
 
       console.log("Login successful");
       setUser(response.data);
-      console.log(response.data);
       navigate("/");
     }
     catch (err) {

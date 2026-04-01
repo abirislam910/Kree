@@ -43,6 +43,8 @@ app.post('/api/generate-image', async (req, res) => {
     if (!prompt) {
       return res.status(400).json({ message: 'Prompt is required' });
     }
+
+    console.log("Beginning image generation with prompt: ", prompt);
   
     try {
       const response = await axios.post(
@@ -54,7 +56,7 @@ app.post('/api/generate-image', async (req, res) => {
           "model": "dall-e-3",
           "quality": "hd",
           "style": "vivid",
-          "response_format": "b64_json",
+          "response_format": "url",
         },
         {
           headers: {
@@ -64,10 +66,18 @@ app.post('/api/generate-image', async (req, res) => {
         }
       );
 
-      const imageData = response.data.data[0].b64_json;
+      console.log("Image URL response received: ", response.data);
+
+      const imageURL = response.data.data[0].url;
+
+      const imageData = await axios.get(imageURL, { responseType: 'arraybuffer' });
+
+      console.log("Image data retrieved successfully");
   
-      return res.json({ imageData });
+      res.setHeader('Content-Type', 'image/png');
+      res.send(Buffer.from(imageData.data));
     } catch (error) {
+      console.error('Error generating image: ', error);
       console.error("STATUS:", error.response?.status);
       console.error("HEADERS:", error.response?.headers);
       console.error("DATA:", error.response?.data);
@@ -316,11 +326,7 @@ app.post('/api/generate-music', async (req, res) => {
           .getPublicUrl(`${user.id}/audio${name.charAt(5)}.mp3`, {
           })
 
-        const imageData = await axios.get(imageURL.publicUrl, {responseType: 'arraybuffer'});
-
-        const base64Image = encode(imageData.data);
-
-        collection.push({ location: location.metadata.location, audioUrl: audioURL.publicUrl, base64: base64Image });
+        collection.push({ location: location.metadata.location, audioUrl: audioURL.publicUrl, imageURL: imageURL.publicUrl });
       }
 
       res.status(200).send(collection);

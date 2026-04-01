@@ -64,13 +64,18 @@ function Home() {
 
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/generate-image`, {
         prompt: fullPrompt,
-      });
+      }
+       , {
+          responseType: 'blob',
+        });
 
       console.log(response.data);
 
-      setImageData(response.data.imageData);
+      const url = URL.createObjectURL(response.data);
 
-      console.log(imageData);
+      console.log("Image URL: ", url);
+
+      setImageData(url);
     }
     catch (err) {
       setError('Failed to fetch image. Please try again.');
@@ -124,6 +129,7 @@ function Home() {
     e.preventDefault();
     setLoading(true);
     await Promise.all([fetchImage(), fetchMusic()]);
+    setAudioBuffer('null');
   };
 
   return (

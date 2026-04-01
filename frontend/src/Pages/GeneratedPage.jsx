@@ -181,7 +181,7 @@ function GeneratedPage() {
     if (!imageData) return;
 
     const link = document.createElement('a');
-    link.href = `data:image/png;base64,${imageData}`;
+    link.href = `${imageData}`;
     link.download = 'generated-image.png';
 
     document.body.appendChild(link);
@@ -236,12 +236,12 @@ function GeneratedPage() {
 
     return (
       <>
-        <Header user={user} image={imageData ? true : false} />
+        <Header user={user} image={imageData ? true : false}/>
         <div
             className="fullscreen-background"
-            style={{ backgroundImage: `url(data:image/png;base64,${imageData})` }}
+            style={{ backgroundImage: `url(${imageData})` }}
             >
-              <div className="secondinput-form">
+              <div className="secondinput-form" >
                 <button onClick={toggleSettings} className='expand-button'>
                   <div id='settings-button' style={{height: '24px'}}>
                     <FaGear />
@@ -289,7 +289,7 @@ function GeneratedPage() {
                       </>
                     )}
 
-                    <button onClick={handleMute} className='expand-button' style={{marginBottom: '-2px', display: isExpanded ? "none" : "block"}}> {volume == 0 ? (<FaVolumeXmark />): (<FaVolumeHigh />)}</button>
+                    <button onClick={handleMute} className='expand-button' style={{marginBottom: '-2px', display: isExpanded ? "none" : "block", textShadow: '0 0 5px black'}}> {volume == 0 ? (<FaVolumeXmark />): (<FaVolumeHigh />)}</button>
                     <input
                       type="range"
                       min="0"
