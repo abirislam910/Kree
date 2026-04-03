@@ -6,7 +6,6 @@ const storage = multer.memoryStorage()
 const upload = multer({ storage: storage })
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const { decode, encode } = require('base64-arraybuffer');
 const { createClient } = require("./lib/supabase.js");
 
 dotenv.config();
@@ -182,11 +181,11 @@ app.post('/api/generate-music', async (req, res) => {
       console.log("Call retrieved successfully");
       if (!user) {
         console.log("User not found");
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(204).json({ user: null });
       }
       else {
         console.log("User found");
-        res.send(user.user_metadata.name);
+        res.json({ user: user.user_metadata.name });
       }
     } catch (error) {
       console.error('Error retrieving user: ', error);
@@ -194,10 +193,14 @@ app.post('/api/generate-music', async (req, res) => {
     }
   });
 
-  app.post('/api/uploadimage', async (req, res) => { 
+  app.post('/api/uploadimage', upload.single('imageData'), async (req, res) => { 
     try {
       const supabase = createClient({ req, res })
-      const {imageData, location} = req.body;
+      const location = req.body.location;
+      const imageData = req.file.buffer;
+      
+      console.log("Image Data Received: ", imageData);
+      console.log("Location Received: ", location);
 
       const { data: { user } } = await supabase.auth.getUser()
 
@@ -220,7 +223,9 @@ app.post('/api/generate-music', async (req, res) => {
         console.error('Error listing images: ', listError);
       }
 
-      const { error: imageError } = await supabase.storage.from('generated_images').upload(`${user.id}/image${list.length + 1}.png`, decode(imageData), {
+      console.log("Image Data: ", imageData);
+
+      const { error: imageError } = await supabase.storage.from('generated_images').upload(`${user.id}/image${list.length + 1}.png`, imageData, {
         contentType: 'image/png',
         cacheControl: '3600',
         metadata: {'location': location},

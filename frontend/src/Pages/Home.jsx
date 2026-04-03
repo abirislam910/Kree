@@ -71,11 +71,7 @@ function Home() {
 
       console.log(response.data);
 
-      const url = URL.createObjectURL(response.data);
-
-      console.log("Image URL: ", url);
-
-      setImageData(url);
+      setImageData(response.data);
     }
     catch (err) {
       setError('Failed to fetch image. Please try again.');
@@ -84,7 +80,7 @@ function Home() {
     }
   };
 
-  const fetchMusic = async () => {
+  const fetchAudio = async () => {
     setError('');
 
     if (!location.trim()) {
@@ -118,7 +114,7 @@ function Home() {
     try {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/getuser`, {}, { withCredentials: true });
 
-      setUser(response.data);
+      setUser(response.data.user);
     }
     catch (err) {      
       console.log('Error fetching user data:', err);
@@ -128,7 +124,7 @@ function Home() {
   const handleGenerate = async (e) => {
     e.preventDefault();
     setLoading(true);
-    await Promise.all([fetchImage(), fetchMusic()]);
+    await Promise.all([fetchImage(), fetchAudio()]);
     setAudioBuffer('null');
   };
 

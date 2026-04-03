@@ -14,6 +14,8 @@ let source = audioContext.createBufferSource();
 function GeneratedPage() {
   const { user } = useContext(UserContext);
   const [message, setMessage] = useState("");
+  const [uploadLock, setUploadLock] = useState(false);
+  const [imageURL, setImageURL] = useState(null);
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [volume, setVolume] = useState(0);
@@ -56,10 +58,10 @@ function GeneratedPage() {
   return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, []);
+  });
 
   useEffect(() => {
-      const loadGeneration = async () => {
+      const loadAudio = async () => {
         await audioContext.resume();
         const audioCopy = audioBuffer.slice(0);
         audioContext.decodeAudioData(audioCopy, (decodedData) => {
@@ -72,14 +74,24 @@ function GeneratedPage() {
         source.start();
       });
       };
-      loadGeneration(); 
-  }, []);
 
-  useEffect(() => {
-    if (!imageData) {
-      navigate("/");
+      const loadImage = () => {
+        const url = URL.createObjectURL(imageData);
+        setImageURL(url);
+      };
+      
+      if (imageData && audioBuffer) {
+        loadAudio(); 
+        loadImage();
+
+        return () => {
+          URL.revokeObjectURL(imageURL);
+        };
     }
-  }, [imageData]);
+    else {
+      navigate('/');
+    }
+  }, [imageData, audioBuffer]);
 
   const handleInputChange = (e) => {
     setLocation(e.target.value);
@@ -192,14 +204,22 @@ function GeneratedPage() {
   const handleUpload = async () => {
     try {
       console.log("Audio Buffer: ", audioBuffer);
+      console.log("Image Data: ", imageData);
       
       var fd = new FormData();
       fd.append('audioData', new Blob([audioBuffer], { type: 'audio/mpeg' }), 'audio.mp3');
 
-      const imageUpload = async () => {await axios.post(`${process.env.REACT_APP_API_URL}/uploadimage`, { imageData: imageData, location: location }, { withCredentials: true })};
+      var imageForm = new FormData();
+      imageForm.append('imageData', imageData, 'image.png');
+      imageForm.append('location', location);
+
+
+      const imageUpload = async () => {await axios.post(`${process.env.REACT_APP_API_URL}/uploadimage`, imageForm, { withCredentials: true })};
       const audioUpload = async () => {await axios.post(`${process.env.REACT_APP_API_URL}/uploadaudio`, fd, { withCredentials: true })};
 
       await Promise.all([imageUpload(), audioUpload()]);
+
+      setUploadLock(true);
 
       console.log('Upload successful');
     } catch (err) {
@@ -239,7 +259,7 @@ function GeneratedPage() {
         <Header user={user} image={imageData ? true : false}/>
         <div
             className="fullscreen-background"
-            style={{ backgroundImage: `url(${imageData})` }}
+            style={{ backgroundImage: `url(${imageURL})` }}
             >
               <div className="secondinput-form" >
                 <button onClick={toggleSettings} className='expand-button'>
@@ -284,7 +304,7 @@ function GeneratedPage() {
                     {user && (
                       <>
                       <button onClick={handleUpload} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
-                        <strong>Upload</strong>
+                        <strong style={{cursor: uploadLock ? 'not-allowed' : 'pointer'}}>Upload{uploadLock ? ' Success!' : ''}</strong>
                       </button>
                       </>
                     )}

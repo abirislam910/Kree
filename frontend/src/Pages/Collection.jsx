@@ -19,7 +19,8 @@ function Collection() {
         async function getCollection() {
 
             const collection = await axios.post(`${process.env.REACT_APP_API_URL}/getcollection`, {}, { withCredentials: true });
-            
+            console.log("Collection data retrieved successfully:", collection.data);
+
             if (!collection.data || collection.data.length === 0) {
                 setMessage("No items in collection");
             } else {
@@ -38,7 +39,6 @@ function Collection() {
     const getUserData = async () => {
         try {
         const response = await axios.post(`${process.env.REACT_APP_API_URL}/getuser`, {}, { withCredentials: true });
-
         setUser(response.data);
         }
         catch (err) {      
@@ -47,10 +47,14 @@ function Collection() {
     };
 
     const selectImage = async (e) => {
-        setLocation(collection[e.currentTarget.id].location);
-        setImageData(collection[e.currentTarget.id].base64);
+        const index = e.currentTarget.id;
+        
+        setLocation(collection[index].location);
 
-        const audioData = await axios.get(collection[e.currentTarget.id].audioUrl, { responseType: 'arraybuffer' });
+        const imageData = await axios.get(collection[index].imageURL, { responseType: 'blob' });
+        setImageData(imageData.data);
+
+        const audioData = await axios.get(collection[index].audioUrl, { responseType: 'arraybuffer' });
         setAudioBuffer(audioData.data);
 
         navigate('/generated');
@@ -63,7 +67,7 @@ function Collection() {
                 <h1 className="subtitle" style={{color: 'black', justifyContent: 'center'}}>{message}</h1>
                 {collection.map((item, index) => (
                     <div id={index} key={index} className="collection-card" onClick={selectImage} style={{ animationDelay: `${index * 0.15}s`, cursor: 'pointer' }}>
-                        <img src={`data:image/png;base64,${item.base64}`} alt={item.location} className="collection-image"/>
+                        <img src={`${item.imageURL}`} alt={item.location} className="collection-image"/>
                         <hr style={{borderTop: '2px solid white', borderRadius: '5px', margin: '1rem'}}/>
                         <div style={{display: 'flex', flexDirection: 'row'}}>
                             <FaDownload style={{margin: '1rem'}}/>
