@@ -36,7 +36,7 @@ app.use(cors({
 });
 app.use(express.json({ limit: '50mb' }));
 
-app.post('/api/generate-image', async (req, res) => {
+app.post('/api/generate/image', async (req, res) => {
     const { prompt } = req.body;
   
     if (!prompt) {
@@ -84,7 +84,7 @@ app.post('/api/generate-image', async (req, res) => {
     }
   });
 
-app.post('/api/generate-music', async (req, res) => {
+app.post('/api/generate/music', async (req, res) => {
     const { prompt } = req.body;
   
     if (!prompt) {
@@ -105,6 +105,8 @@ app.post('/api/generate-music', async (req, res) => {
           responseType: 'arraybuffer',
         }
       );
+
+      console.log("Music data retrieved successfully");
 
       res.setHeader('Content-Type', 'audio/mpeg');
       res.send(Buffer.from(generate_response.data));
@@ -172,7 +174,7 @@ app.post('/api/generate-music', async (req, res) => {
     }
   });
 
-  app.post('/api/getuser', async (req, res) => { 
+  app.get('/api/user', async (req, res) => { 
     try {
       const supabase = createClient({ req, res })
 
@@ -193,7 +195,7 @@ app.post('/api/generate-music', async (req, res) => {
     }
   });
 
-  app.post('/api/uploadimage', upload.single('imageData'), async (req, res) => { 
+  app.post('/api/collection/image', upload.single('imageData'), async (req, res) => { 
     try {
       const supabase = createClient({ req, res })
       const location = req.body.location;
@@ -240,7 +242,7 @@ app.post('/api/generate-music', async (req, res) => {
     }
   });
 
-  app.post('/api/uploadaudio', upload.single('audioData'), async (req, res) => { 
+  app.post('/api/collection/audio', upload.single('audioData'), async (req, res) => { 
     try {
       const supabase = createClient({ req, res })
       const audioData = req.file.buffer;
@@ -284,7 +286,7 @@ app.post('/api/generate-music', async (req, res) => {
     }
   });
 
-  app.post('/api/getcollection', async (req, res) => { 
+  app.get('/api/collection', async (req, res) => { 
     try {
       const supabase = createClient({ req, res })
 

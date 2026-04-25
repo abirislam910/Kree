@@ -1,6 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
-import Header from './Header.jsx';
-import { UserContext } from './UserContext.jsx';
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaDownload } from "react-icons/fa6";
 import { ContentContext } from './ContentContext.jsx';
@@ -9,16 +7,15 @@ import '../App.css'
 
 function Collection() {
     const navigate = useNavigate();
-    const { user, setUser } = useContext(UserContext);
     const [collection, setCollection] = useState([]);
     const [message, setMessage] = useState("Loading collection...");
 
-    const { imageData, setImageData, audioBuffer, setAudioBuffer, location, setLocation } = useContext(ContentContext);
+    const { setImageData, setAudioBuffer, setLocation } = useContext(ContentContext);
 
     useEffect(() => {
         async function getCollection() {
 
-            const collection = await axios.post(`${process.env.REACT_APP_API_URL}/getcollection`, {}, { withCredentials: true });
+            const collection = await axios.get(`${process.env.REACT_APP_API_URL}/collection`, { withCredentials: true });
             console.log("Collection data retrieved successfully:", collection.data);
 
             if (!collection.data || collection.data.length === 0) {
@@ -31,20 +28,6 @@ function Collection() {
 
         getCollection();
     }, []);
-
-    useEffect(() => {
-        getUserData();
-    }, []);
-
-    const getUserData = async () => {
-        try {
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}/getuser`, {}, { withCredentials: true });
-        setUser(response.data);
-        }
-        catch (err) {      
-        console.log('Error fetching user data:', err);
-        }
-    };
 
     const selectImage = async (e) => {
         const index = e.currentTarget.id;
@@ -62,7 +45,6 @@ function Collection() {
 
     return (
         <div>
-            <Header user={user} />
             <div className="collection-container">
                 <h1 className="subtitle" style={{color: 'black', justifyContent: 'center'}}>{message}</h1>
                 {collection.map((item, index) => (

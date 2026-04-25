@@ -1,5 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
-import Header from './Header.jsx';
+import { useState, useContext, useEffect } from "react";
 import { UserContext } from './UserContext.jsx';
 import { ContentContext } from './ContentContext.jsx';
 import axios from "axios";
@@ -9,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const gainNode = audioContext.createGain();
-let source = audioContext.createBufferSource();
 
 function GeneratedPage() {
   const { user } = useContext(UserContext);
@@ -48,19 +46,21 @@ function GeneratedPage() {
   }, [volume]);
 
   useEffect(() => {
-  const handleBeforeUnload = (e) => {
-    e.preventDefault();
-    e.returnValue = '';
-  };
-
-  window.addEventListener('beforeunload', handleBeforeUnload);
-
-  return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = '';
     };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+      };
   });
 
   useEffect(() => {
+      let source = audioContext.createBufferSource();
+
       const loadAudio = async () => {
         await audioContext.resume();
         const audioCopy = audioBuffer.slice(0);
@@ -149,7 +149,7 @@ function GeneratedPage() {
         }
       );
 
-      //const buffer = await audioContext.decodeAudioData(response.data);
+      /*const buffer = await audioContext.decodeAudioData(response.data);
       source.stop();
       source.disconnect();
 
@@ -165,7 +165,7 @@ function GeneratedPage() {
         newSource.start();
       });
       source = newSource;
-      setAudioBuffer(response.data);
+      setAudioBuffer(response.data);*/
     }
     catch (err) {
       setError('Failed to generate music. Please try again.');
@@ -184,10 +184,6 @@ function GeneratedPage() {
     await Promise.all([fetchImage(), fetchMusic()]);
     setLoading(false);
   };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  }
 
   const handleDownload = () => {
     if (!imageData) return;
@@ -214,8 +210,8 @@ function GeneratedPage() {
       imageForm.append('location', location);
 
 
-      const imageUpload = async () => {await axios.post(`${process.env.REACT_APP_API_URL}/uploadimage`, imageForm, { withCredentials: true })};
-      const audioUpload = async () => {await axios.post(`${process.env.REACT_APP_API_URL}/uploadaudio`, fd, { withCredentials: true })};
+      const imageUpload = async () => {await axios.post(`${process.env.REACT_APP_API_URL}/collection/image`, imageForm, { withCredentials: true })};
+      const audioUpload = async () => {await axios.post(`${process.env.REACT_APP_API_URL}/collection/audio`, fd, { withCredentials: true })};
 
       await Promise.all([imageUpload(), audioUpload()]);
 
@@ -255,8 +251,6 @@ function GeneratedPage() {
   }
 
     return (
-      <>
-        <Header user={user} image={imageData ? true : false}/>
         <div
             className="fullscreen-background"
             style={{ backgroundImage: `url(${imageURL})` }}
@@ -325,7 +319,6 @@ function GeneratedPage() {
               </div>
             </div>
         </div>
-      </>
       )
 }
 
