@@ -1,15 +1,14 @@
 import { useState, useContext } from "react";
 import { UserContext } from './UserContext.jsx';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import '../App.css'
 
 function Signout() {
   const navigate = useNavigate();
+  const redirect = useLocation();
   const { signout } = useContext(UserContext);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-
-  console.log("signout component rendered");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,7 +17,7 @@ function Signout() {
 
     try {
       await signout();
-      navigate("/");
+      navigate(redirect.state.from === '/collection' ? '/' : redirect.state.from);
     }
     catch (err) {
       setMessage(err.message)

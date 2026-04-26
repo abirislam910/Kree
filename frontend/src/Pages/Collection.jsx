@@ -10,13 +10,11 @@ function Collection() {
     const [collection, setCollection] = useState([]);
     const [message, setMessage] = useState("Loading collection...");
 
-    const { setImageData, setAudioBuffer, setLocation } = useContext(ContentContext);
+    const { setImageData, setAudioBuffer } = useContext(ContentContext);
 
     useEffect(() => {
         async function getCollection() {
-
             const collection = await axios.get(`${process.env.REACT_APP_API_URL}/collection`, { withCredentials: true });
-            console.log("Collection data retrieved successfully:", collection.data);
 
             if (!collection.data || collection.data.length === 0) {
                 setMessage("No items in collection");
@@ -32,15 +30,13 @@ function Collection() {
     const selectImage = async (e) => {
         const index = e.currentTarget.id;
         
-        setLocation(collection[index].location);
-
         const imageData = await axios.get(collection[index].imageURL, { responseType: 'blob' });
         setImageData(imageData.data);
 
         const audioData = await axios.get(collection[index].audioUrl, { responseType: 'arraybuffer' });
         setAudioBuffer(audioData.data);
 
-        navigate('/generated');
+        navigate('/generated', { state: { location: collection[index].location } });
     }
 
     return (

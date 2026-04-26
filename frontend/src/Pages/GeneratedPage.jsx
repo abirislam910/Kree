@@ -1,13 +1,12 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import { UserContext } from './UserContext.jsx';
 import { ContentContext } from './ContentContext.jsx';
 import axios from "axios";
 import { FaGear, FaVolumeHigh, FaVolumeXmark } from "react-icons/fa6";
 import '../App.css'
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-const gainNode = audioContext.createGain();
 
 function GeneratedPage() {
   const { user } = useContext(UserContext);
@@ -16,17 +15,25 @@ function GeneratedPage() {
   const [imageURL, setImageURL] = useState(null);
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [volume, setVolume] = useState(0);
+  const [volume, setVolume] = useState(0.1);
   const [volumeStore, setVolumeStore] = useState(0);
   const [error, setError] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
 
-  const { imageData, setImageData, audioBuffer, setAudioBuffer, location, setLocation } = useContext(ContentContext);
+  const source = useRef(null);
+  const gainNode = useRef(audioContext.createGain());
+  const audioStarted = useRef(false);
+
+  const locationData = useLocation();
+
+  const [location, setLocation] = useState(locationData.state?.location ? locationData.state.location : '');
+
+  const { imageData, audioBuffer, generateContent } = useContext(ContentContext);
 
   useEffect(() => {
-    gainNode.connect(audioContext.destination);
-    gainNode.gain.setTargetAtTime(
+    gainNode.current.connect(audioContext.destination);
+    gainNode.current.gain.setTargetAtTime(
       volume,
       audioContext.currentTime,
       0.01
@@ -59,25 +66,31 @@ function GeneratedPage() {
   });
 
   useEffect(() => {
-      let source = audioContext.createBufferSource();
-
-      const loadAudio = async () => {
-        await audioContext.resume();
-        const audioCopy = audioBuffer.slice(0);
-        audioContext.decodeAudioData(audioCopy, (decodedData) => {
-          source.buffer = decodedData;
-          source.loop = true;
-          setVolume(0.1);
-          gainNode.gain.value = volume;
-          source.connect(gainNode);
-          gainNode.connect(audioContext.destination);
-        source.start();
-      });
-      };
-
       const loadImage = () => {
         const url = URL.createObjectURL(imageData);
         setImageURL(url);
+        URL.revokeObjectURL(imageData);
+      };
+
+      const loadAudio = async () => {
+        if (audioStarted.current) {
+          source.current.stop();
+          gainNode.current.disconnect();
+          source.current = null;
+          gainNode.current = audioContext.createGain();
+        }
+        await audioContext.resume();
+        const audioCopy = audioBuffer.slice(0);
+        audioContext.decodeAudioData(audioCopy, (decodedData) => {
+          source.current = audioContext.createBufferSource();
+          source.current.buffer = decodedData;
+          source.current.loop = true;
+          gainNode.current.gain.value = volume;
+          source.current.connect(gainNode.current);
+          gainNode.current.connect(audioContext.destination);
+          source.current.start();
+          audioStarted.current = true;
+        });
       };
       
       if (imageData && audioBuffer) {
@@ -86,6 +99,10 @@ function GeneratedPage() {
 
         return () => {
           URL.revokeObjectURL(imageURL);
+          if (audioStarted.current) {
+            source.current.stop();
+            gainNode.current.disconnect();
+          }
         };
     }
     else {
@@ -96,83 +113,6 @@ function GeneratedPage() {
   const handleInputChange = (e) => {
     setLocation(e.target.value);
   };
-
-  const fetchImage = async () => {
-    setError('');
-
-    if (!location.trim()) {
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setError('');
-    try {
-      const fullPrompt = "Ultra-detailed lofi illustration of a cozy interior scene inspired by " + location + ". Warm ambient lighting, golden hour glow, soft shadows, gentle depth of field. Aesthetic clutter: plants, books, textured fabrics, warm lamps, anything that fits the specified location:" + location + ". Calm, nostalgic, peaceful mood. Soft grain, muted but colorful palette.";
-
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/generate-image`, {
-        prompt: fullPrompt,
-      });
-
-      console.log(response.data);
-
-      setImageData(response.data.imageData);
-
-      console.log(imageData);
-    }
-    catch (err) {
-      setError('Failed to fetch image. Please try again.');
-      console.log(err);
-      setLoading(false);
-    }
-  };
-
-  const fetchMusic = async () => {
-    setError('');
-
-    if (!location.trim()) {
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setError('');
-    try {
-      const fullPrompt = "Chill lo-fi instrumental track, 70-85 BPM. Warm vinyl texture, soft tape saturation, subtle crackle. Instruments inspired by" + location + ". Dreamy electric piano chords, mellow bassline, soft boom-bap drums"
-
-      await audioContext.resume();
-
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/generate-music`, 
-        {
-          prompt: fullPrompt,
-        },
-        {
-          responseType: "arraybuffer",
-        }
-      );
-
-      /*const buffer = await audioContext.decodeAudioData(response.data);
-      source.stop();
-      source.disconnect();
-
-      const newSource = audioContext.createBufferSource();
-
-      audioContext.decodeAudioData(response.data, (decodedData) => {
-          newSource.buffer = decodedData;
-          newSource.loop = true;
-          setVolume(0.1);
-          gainNode.gain.value = volume;
-          newSource.connect(gainNode);
-          gainNode.connect(audioContext.destination);
-        newSource.start();
-      });
-      source = newSource;
-      setAudioBuffer(response.data);*/
-    }
-    catch (err) {
-      setError('Failed to generate music. Please try again.');
-      console.log(err);
-      setLoading(false);
-    }
-  };
   
   const handleButtonClick = () => {
     setIsExpanded(!isExpanded);
@@ -181,7 +121,14 @@ function GeneratedPage() {
   const handleGenerate = async (e) => {
     e.preventDefault();
     setLoading(true);
-    await Promise.all([fetchImage(), fetchMusic()]);
+    setError('');
+    try {
+      await generateContent(location);
+    } 
+    catch (err) {
+      setError('Error generating content. Please try again.');
+      console.error(err);
+    }
     setLoading(false);
   };
 
@@ -199,9 +146,8 @@ function GeneratedPage() {
 
   const handleUpload = async () => {
     try {
-      console.log("Audio Buffer: ", audioBuffer);
-      console.log("Image Data: ", imageData);
-      
+      setUploadLock(true);
+      setMessage("ing...");
       var fd = new FormData();
       fd.append('audioData', new Blob([audioBuffer], { type: 'audio/mpeg' }), 'audio.mp3');
 
@@ -215,10 +161,9 @@ function GeneratedPage() {
 
       await Promise.all([imageUpload(), audioUpload()]);
 
-      setUploadLock(true);
-
-      console.log('Upload successful');
+      setMessage(" successful!");
     } catch (err) {
+      setUploadLock(false);
       console.error('Error uploading:', err);
     }
   }
@@ -297,8 +242,8 @@ function GeneratedPage() {
                     </button>
                     {user && (
                       <>
-                      <button onClick={handleUpload} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
-                        <strong style={{cursor: uploadLock ? 'not-allowed' : 'pointer'}}>Upload{uploadLock ? ' Success!' : ''}</strong>
+                      <button onClick={handleUpload} disabled={uploadLock} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
+                        <strong style={{cursor: uploadLock ? 'not-allowed' : 'pointer'}}>Upload{message}</strong>
                       </button>
                       </>
                     )}

@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { UserContext } from './UserContext.jsx';
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import '../App.css'
 
 function Login() {
@@ -11,13 +11,15 @@ function Login() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const redirect = useLocation();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
     setLoading(true);
     try {
       await login(e, email, password);
-      navigate("/");
+      navigate(redirect.state.from);
     }
     catch (err) {
       setMessage("Error logging in");

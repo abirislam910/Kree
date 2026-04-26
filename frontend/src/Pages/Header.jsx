@@ -8,6 +8,7 @@ import '../App.css';
 function Header() {
   const [isOpen, setOpen] = useState(false);
   const  { user } = useContext(UserContext);
+  const { imageData } = useContext(ContentContext);
   const { pathname } = useLocation();
 
   return (
@@ -15,17 +16,17 @@ function Header() {
       <Hamburger toggled={isOpen} toggle={setOpen} color={pathname === '/generated' ? '#faf7eb' : '#35BB8B'}/>
       <nav className={pathname === '/generated' ? "nav-links-image" : "nav-links"}>
         {isOpen && pathname !== '/' && pathname !== '/generated' && 
-          <Link to="/">
-            <strong>Home</strong>
+          <Link to={imageData ? '/generated' : '/'}>
+            <strong>{imageData ? 'Generated Content' : 'Home'}</strong>
           </Link>
         }
         {isOpen && pathname  !== '/login' && !user &&
-            <Link to="/login">
+            <Link to="/login" state={{ from: pathname }}>
               <strong>Login</strong>
             </Link>
         }
         {isOpen && pathname !== '/signout' && user &&
-            <Link to="/signout">
+            <Link to="/signout" state={{ from: pathname }}>
               <strong>Sign Out</strong>
             </Link>
         }

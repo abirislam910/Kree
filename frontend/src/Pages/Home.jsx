@@ -1,5 +1,4 @@
-import {useState, useEffect, useContext} from 'react';
-import axios from 'axios';
+import {useState, useContext} from 'react';
 import ParallaxLogo from './ParallaxLogo.jsx';
 import { UserContext }  from './UserContext.jsx';
 import { ContentContext } from './ContentContext.jsx';
@@ -10,14 +9,9 @@ function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { user } = useContext(UserContext);
-  const { imageData, fetchImage, audioBuffer, fetchAudio, location, setLocation } = useContext(ContentContext);
+  const [location, setLocation] = useState('');
+  const { generateContent } = useContext(ContentContext);
   const navigate = useNavigate();
-
-  /*useEffect(() => {
-    if (imageData && audioBuffer) {
-      navigate('/generated');
-    }
-  }, [imageData, audioBuffer, navigate]);*/
 
   const handleInputChange = (e) => {
     setLocation(e.target.value);
@@ -28,8 +22,8 @@ function Home() {
     setError('');
     setLoading(true);
     try {
-      await Promise.all([fetchImage(location), fetchAudio(location)]);
-      navigate('/generated');
+      await generateContent(location);
+      navigate('/generated', { state: { location } });
     } 
     catch (err) {
       setError('Error generating content. Please try again.');

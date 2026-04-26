@@ -6,7 +6,6 @@ export const ContentContext = createContext();
 export function ContentProvider({ children }) {
   const [imageData, setImageData] = useState(null);
   const [audioBuffer, setAudioBuffer] = useState(null);
-  const [location, setLocation] = useState("");
 
   const fetchImage = async (location) => {
 
@@ -24,9 +23,7 @@ export function ContentProvider({ children }) {
           responseType: 'blob',
         });
 
-      console.log(response.data);
-
-      setImageData(response.data);
+      return response.data;
     }
     catch (err) {
       console.log(err);
@@ -51,15 +48,21 @@ export function ContentProvider({ children }) {
         }
       );
 
-      setAudioBuffer(response.data);
+      return response.data;
     }
     catch (err) {
       console.log(err);
     }
   };
 
+  const generateContent = async (location) => {
+    const [image, audio] = await Promise.all([fetchImage(location), fetchAudio(location)]);
+    setAudioBuffer(audio);
+    setImageData(image);
+  };
+
   return (
-    <ContentContext.Provider value={{ imageData, setImageData, fetchImage, audioBuffer, setAudioBuffer, fetchAudio, location, setLocation }}>
+    <ContentContext.Provider value={{ imageData, setImageData, fetchImage, audioBuffer, setAudioBuffer, fetchAudio, generateContent }}>
       {children}
     </ContentContext.Provider>
   );
