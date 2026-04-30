@@ -15,7 +15,7 @@ function Collection() {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("Loading collection...");
 
-    const { imageData, setImageData, audioBuffer, setAudioBuffer, location, setLocation } = useContext(ContentContext);
+    const { setImageData, setAudioBuffer, setLocation } = useContext(ContentContext);
 
     useEffect(() => {
         async function getCollection() {
@@ -55,7 +55,7 @@ function Collection() {
         const audioData = await axios.get(collection[e.currentTarget.id].audioUrl, { responseType: 'arraybuffer' });
         setAudioBuffer(audioData.data);
 
-        navigate('/generated', { state: { location: collection[index].location } });
+        navigate('/generated', { state: { location: collection[e.currentTarget.id].location } });
     }
 
     const deleteItem = async (index) => {
