@@ -7,7 +7,6 @@ const upload = multer({ storage: storage })
 const crypto = require('crypto');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const { decode, encode } = require('base64-arraybuffer');
 const { createClient } = require("./lib/supabase.js");
 
 dotenv.config();
@@ -38,7 +37,7 @@ app.use(cors({
 });
 app.use(express.json({ limit: '50mb' }));
 
-app.post('/api/generate-image', async (req, res) => {
+app.post('/api/generate/image', async (req, res) => {
     const { prompt } = req.body;
   
     if (!prompt) {
@@ -86,7 +85,7 @@ app.post('/api/generate-image', async (req, res) => {
     }
   });
 
-app.post('/api/generate-music', async (req, res) => {
+app.post('/api/generate/music', async (req, res) => {
     const { prompt } = req.body;
   
     if (!prompt) {
@@ -107,6 +106,8 @@ app.post('/api/generate-music', async (req, res) => {
           responseType: 'arraybuffer',
         }
       );
+
+      console.log("Music data retrieved successfully");
 
       res.setHeader('Content-Type', 'audio/mpeg');
       res.send(Buffer.from(generate_response.data));
@@ -174,7 +175,7 @@ app.post('/api/generate-music', async (req, res) => {
     }
   });
 
-  app.post('/api/getuser', async (req, res) => { 
+  app.get('/api/user', async (req, res) => { 
     try {
       const supabase = createClient({ req, res })
 
@@ -183,11 +184,11 @@ app.post('/api/generate-music', async (req, res) => {
       console.log("Call retrieved successfully");
       if (!user) {
         console.log("User not found");
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(204).json({ user: null });
       }
       else {
         console.log("User found");
-        res.send(user.user_metadata.name);
+        res.json({ user: user.user_metadata.name });
       }
     } catch (error) {
       console.error('Error retrieving user: ', error);
@@ -262,7 +263,7 @@ app.post('/api/generate-music', async (req, res) => {
     }
   });
 
-  app.post('/api/getcollection', async (req, res) => { 
+  app.get('/api/collection', async (req, res) => { 
     try {
       const supabase = createClient({ req, res })
 

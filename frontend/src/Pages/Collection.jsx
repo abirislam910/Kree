@@ -1,6 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
-import Header from './Header.jsx';
-import { UserContext } from './UserContext.jsx';
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaDownload, FaTrash } from "react-icons/fa6";
 import { ContentContext } from './ContentContext.jsx';
@@ -9,7 +7,6 @@ import '../App.css'
 
 function Collection() {
     const navigate = useNavigate();
-    const { user, setUser } = useContext(UserContext);
     const [collection, setCollection] = useState([]);
     const [deleteIndex, setDeleteIndex] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -19,9 +16,8 @@ function Collection() {
 
     useEffect(() => {
         async function getCollection() {
+            const collection = await axios.get(`${process.env.REACT_APP_API_URL}/collection`, { withCredentials: true });
 
-            const collection = await axios.post(`${process.env.REACT_APP_API_URL}/getcollection`, {}, { withCredentials: true });
-            
             if (!collection.data || collection.data.length === 0) {
                 setMessage("No items in collection");
             } else {
@@ -33,26 +29,13 @@ function Collection() {
         getCollection();
     }, []);
 
-    useEffect(() => {
-        getUserData();
-    }, []);
-
-    const getUserData = async () => {
-        try {
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}/getuser`, {}, { withCredentials: true });
-
-        setUser(response.data);
-        }
-        catch (err) {      
-        console.log('Error fetching user data:', err);
-        }
-    };
-
     const selectImage = async (e) => {
-        setLocation(collection[e.currentTarget.id].location);
-        setImageData(collection[e.currentTarget.id].base64);
+        const index = e.currentTarget.id;
+        
+        const imageData = await axios.get(collection[index].imageURL, { responseType: 'blob' });
+        setImageData(imageData.data);
 
-        const audioData = await axios.get(collection[e.currentTarget.id].audioUrl, { responseType: 'arraybuffer' });
+        const audioData = await axios.get(collection[index].audioUrl, { responseType: 'arraybuffer' });
         setAudioBuffer(audioData.data);
 
         navigate('/generated', { state: { location: collection[e.currentTarget.id].location } });
@@ -73,7 +56,6 @@ function Collection() {
 
     return (
         <div>
-            <Header user={user} />
             <div className="collection-container">
                 <h1 className="subtitle" style={{color: 'black', justifyContent: 'center'}}>{message}</h1>
                 {deleteIndex !== null && (

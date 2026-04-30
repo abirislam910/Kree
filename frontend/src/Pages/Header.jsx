@@ -1,15 +1,15 @@
-import React, { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Hamburger from 'hamburger-react'
-import { ContentContext } from './ContentContext.jsx';
 import { Link, useLocation } from "react-router-dom";
+import { UserContext } from './UserContext.jsx';
+import { ContentContext } from "./ContentContext";
 import '../App.css';
 
 function Header() {
   const [isOpen, setOpen] = useState(false);
-  const location = useLocation();
-  const pathname = location.pathname;
-  const { user } = useContext(ContentContext);
+  const  { user } = useContext(UserContext);
   const { imageData } = useContext(ContentContext);
+  const { pathname } = useLocation();
 
   return (
     <div className="header" style={{backgroundColor: pathname === '/generated'  ? 'transparent' : '#faf7eb'}}>
@@ -17,25 +17,25 @@ function Header() {
       <nav className={pathname === '/generated' ? "nav-links-image" : "nav-links"}>
         {isOpen && pathname !== '/' && pathname !== '/generated' && 
           <Link to={imageData ? '/generated' : '/'}>
-            <strong>{imageData ? 'Wallpaper' : 'Home'}</strong>
+            <strong>{imageData ? 'Generated Content' : 'Home'}</strong>
           </Link>
         }
-        {isOpen && window.location.pathname !== '/login' && !user &&
-            <Link to="/login">
+        {isOpen && pathname  !== '/login' && !user &&
+            <Link to="/login" state={{ from: pathname }}>
               <strong>Login</strong>
             </Link>
         }
-        {isOpen && window.location.pathname !== '/signout' && user &&
-            <Link to="/signout">
+        {isOpen && pathname !== '/signout' && user &&
+            <Link to="/signout" state={{ from: pathname }}>
               <strong>Sign Out</strong>
             </Link>
         }
-        {isOpen && window.location.pathname !== '/collection' && user &&
+        {isOpen && pathname !== '/collection' && user &&
             <Link to="/collection">
               <strong>Collection</strong>
             </Link>
         }
-        {isOpen && window.location.pathname !== '/registration' && !user &&
+        {isOpen && pathname !== '/registration' && !user &&
           <Link to="/registration">
             <strong>Register</strong>
           </Link>

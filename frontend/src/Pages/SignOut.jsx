@@ -1,26 +1,23 @@
-import React, { useState, useContext } from "react";
-import Header from './Header.jsx';
+import { useState, useContext } from "react";
 import { UserContext } from './UserContext.jsx';
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useNavigate, useLocation } from "react-router-dom";
 import '../App.css'
 
 function Signout() {
   const navigate = useNavigate();
-  const { user, setUser } = useContext(UserContext);
+  const redirect = useLocation();
+  const { signout } = useContext(UserContext);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setMessage("");
     setLoading(true);
 
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/signout`, {}, { withCredentials: true });
-
-      setUser('');
-      navigate("/");
+      await signout();
+      navigate(redirect.state.from === '/collection' ? '/' : redirect.state.from);
     }
     catch (err) {
       setMessage(err.message)
@@ -30,7 +27,6 @@ function Signout() {
 
     return (
         <div>
-            <Header user={user} />
             <div className="auth-container">
                 <div className="auth-card">
                     <h2 className="auth-title">Log Out</h2>

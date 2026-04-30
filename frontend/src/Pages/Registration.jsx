@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import Header from './Header.jsx';
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
@@ -24,7 +23,7 @@ function Registration() {
        { withCredentials: true }
     );
 
-      setMessage("Please check your email for a confirmation link");
+    setMessage("Please check your email for a confirmation link");
     }
     catch (err) {
       setMessage(err);
@@ -39,7 +38,6 @@ function Registration() {
 
   return (
     <div>
-        <Header />
         <div className="auth-container">
             <div className="auth-card">
                 <h2 className="auth-title">Register</h2>

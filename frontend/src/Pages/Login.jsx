@@ -1,34 +1,25 @@
-import React, { useState, useContext } from "react";
-import Header from './Header.jsx';
+import { useState, useContext } from "react";
 import { UserContext } from './UserContext.jsx';
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import '../App.css'
 
 function Login() {
   const navigate = useNavigate();
-  const { setUser } = useContext(UserContext);
+  const { login } = useContext(UserContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const redirect = useLocation();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
     setLoading(true);
-
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/login`, {
-        email: email,
-        password: password
-      },
-       { withCredentials: true }
-    );
-
-      console.log("Login successful");
-      setUser(response.data);
-      navigate("/");
+      await login(e, email, password);
+      navigate(redirect.state.from);
     }
     catch (err) {
       setMessage("Error logging in");
@@ -41,7 +32,6 @@ function Login() {
 
     return (
         <div>
-            <Header />
             <div className="auth-container">
                 <div className="auth-card">
                     <h2 className="auth-title">Log In</h2>

@@ -1,6 +1,5 @@
-import React, {useState, useEffect, useContext} from 'react';
-import axios from 'axios';
-import Header from './Header.jsx';
+import {useState, useContext} from 'react';
+import ParallaxLogo from './ParallaxLogo.jsx';
 import { UserContext }  from './UserContext.jsx';
 import { ContentContext } from './ContentContext.jsx';
 import { useNavigate } from "react-router-dom";
@@ -9,138 +8,40 @@ import '../App.css';
 function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { user, setUser } = useContext(UserContext);
-  const { imageData, setImageData, audioBuffer, setAudioBuffer, location, setLocation } = useContext(ContentContext);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const { user } = useContext(UserContext);
+  const [location, setLocation] = useState('');
+  const { generateContent } = useContext(ContentContext);
   const navigate = useNavigate();
-
-  useEffect(() => {
-        getUserData();
-    }, []);
-
-  useEffect(() => {
-    if (imageData && audioBuffer) {
-      navigate('/generated');
-    }
-  }, [imageData, audioBuffer]);
-
-    useEffect(() => {
-        const handleMouseMove = (event) => {
-            const { clientX: x, clientY: y } = event;
-            setPosition({ x, y });
-        };
-
-        window.addEventListener('mousemove', handleMouseMove);
-
-        return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        };
-    }, []);
-
-    const moveStyle = {
-        transform: `translate(${-((position.x - window.innerWidth / 2) / 50)}px, ${-((position.y - window.innerHeight / 2) / 50)}px)`,
-        transition: 'transform 0.8s ease-out',
-        animation: 'fadeIn 1s ease-in-out forwards',
-        alignSelf: 'center',
-        minWidth: '700px',
-        width: '40vw',
-      };
 
   const handleInputChange = (e) => {
     setLocation(e.target.value);
   };
 
-  const fetchImage = async () => {
-    setError('');
-
-    if (!location.trim()) {
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setError('');
-    try {
-      const fullPrompt = "Cartoonish, lo-fi illustration of a cozy interior scene inspired by " + location + ". Warm ambient lighting, golden hour glow, soft shadows, gentle depth of field. Aesthetic clutter: plants, books, textured fabrics, warm lamps, anything that fits the specified location:" + location + ". Calm, nostalgic, peaceful mood. Soft grain, muted but colorful palette.";
-
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/generate-image`, {
-        prompt: fullPrompt,
-      }
-       , {
-          responseType: 'blob',
-        });
-
-      console.log(response.data);
-
-      const url = URL.createObjectURL(response.data);
-
-      console.log("Image URL: ", url);
-
-      setImageData(url);
-    }
-    catch (err) {
-      setError('Failed to fetch image. Please try again.');
-      console.log(err);
-      setLoading(false);
-    }
-  };
-
-  const fetchMusic = async () => {
-    setError('');
-
-    if (!location.trim()) {
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setError('');
-    try {
-      const fullPrompt = "Chill lo-fi instrumental track, 70-85 BPM. Warm vinyl texture, soft tape saturation, subtle crackle. Instruments inspired by" + location + ". Dreamy electric piano chords, mellow bassline, soft boom-bap drums"
-
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/generate-music`, 
-        {
-          prompt: fullPrompt,
-        },
-        {
-          responseType: "arraybuffer",
-        }
-      );
-
-      setAudioBuffer(response.data);
-    }
-    catch (err) {
-      setError('Failed to generate music. Please try again.');
-      console.log(err);
-      setLoading(false);
-    }
-  };
-
-  const getUserData = async () => {
-    try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/getuser`, {}, { withCredentials: true });
-
-      setUser(response.data);
-    }
-    catch (err) {      
-      console.log('Error fetching user data:', err);
-    }
-  };
-
   const handleGenerate = async (e) => {
     e.preventDefault();
+    setError('');
     setLoading(true);
-    await Promise.all([fetchImage(), fetchMusic()]);
-    setAudioBuffer('null');
+    try {
+      await generateContent(location);
+      navigate('/generated', { state: { location } });
+    } 
+    catch (err) {
+      setError('Error generating content. Please try again.');
+      setLoading(false);
+      console.error(err);
+    }
   };
 
   return (
     <div>
-        <Header user={user} image={imageData ? true : false}/>
         <div className="app">
             {user && <h1 className= 'nav-links'>Hello {user}!</h1>}
-            <img style={moveStyle} src="./logo.png" alt="Logo"/>
+            <ParallaxLogo />
             <h1 className="fade-in-element" style={{
                 fontSize: '1.5rem',
-                }}>Study In Your Happy Place</h1>
+                }}>
+              Study In Your Happy Place
+            </h1>
             <form onSubmit={handleGenerate} className="input-form">
                 <input
                     type="text"
