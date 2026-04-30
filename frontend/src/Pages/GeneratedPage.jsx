@@ -195,13 +195,15 @@ function GeneratedPage() {
       
       var fd = new FormData();
       fd.append('audioData', new Blob([audioBuffer], { type: 'audio/mpeg' }), 'audio.mp3');
+      fd.append('imageData', imageData, 'image.png');
+      fd.append('location', location);
 
-      const imageUpload = async () => {await axios.post(`${process.env.REACT_APP_API_URL}/uploadimage`, { imageData: imageData, location: location }, { withCredentials: true })};
-      const audioUpload = async () => {await axios.post(`${process.env.REACT_APP_API_URL}/uploadaudio`, fd, { withCredentials: true })};
 
-      await Promise.all([imageUpload(), audioUpload()]);
+      const contentUpload = async () => {await axios.post(`${process.env.REACT_APP_API_URL}/collection`, fd, { withCredentials: true })};
 
-      console.log('Upload successful');
+      await contentUpload();
+
+      setMessage(" Successful!");
     } catch (err) {
       console.error('Error uploading:', err);
     }

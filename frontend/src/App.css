@@ -414,18 +414,52 @@ h1 {
   animation: fadeIn 0.5s ease forwards;
 }
 
-.collection-card:hover {
-  background: #35BB8B;
-  transition: 0.5s ease;
-}
-
 .collection-image {
   max-width: 70vw;
   border-radius: 8px;
   margin: 1rem;
 }
 
+.select-content-button {
+  margin: 1rem;
+  cursor: pointer;
+  transition: 0.3s ease, transform 0.1s ease;
+}
 
+.select-content-button:hover {
+  color: #35BB8B;
+}
+
+.delete-content-button {
+  margin: 1rem;
+  cursor: pointer;
+  transition: 0.3s ease, transform 0.1s ease;
+}
+
+.delete-content-button:hover {
+  color: #cc4a4a;
+}
+
+.delete-confirmation-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #cc4a4a;
+  padding: 2rem;
+  border-radius: 12px;
+  color: #faf7eb;
+  text-align: center;
+  z-index: 1001;
+}
+
+.blackout-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  animation: fadeIn 0.5s ease;
+}
 
 /* ---------- Animation ---------- */
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import Header from './Header.jsx';
 import { UserContext } from './UserContext.jsx';
 import { useNavigate } from "react-router-dom";
-import { FaDownload } from "react-icons/fa6";
+import { FaDownload, FaTrash } from "react-icons/fa6";
 import { ContentContext } from './ContentContext.jsx';
 import axios from "axios";
 import '../App.css'
@@ -11,6 +11,8 @@ function Collection() {
     const navigate = useNavigate();
     const { user, setUser } = useContext(UserContext);
     const [collection, setCollection] = useState([]);
+    const [deleteIndex, setDeleteIndex] = useState(null);
+    const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("Loading collection...");
 
     const { imageData, setImageData, audioBuffer, setAudioBuffer, location, setLocation } = useContext(ContentContext);
@@ -53,21 +55,45 @@ function Collection() {
         const audioData = await axios.get(collection[e.currentTarget.id].audioUrl, { responseType: 'arraybuffer' });
         setAudioBuffer(audioData.data);
 
-        navigate('/generated');
+        navigate('/generated', { state: { location: collection[index].location } });
     }
+
+    const deleteItem = async (index) => {
+        setLoading(true);
+        try {
+            await axios.delete(`${process.env.REACT_APP_API_URL}/collection/${collection[index].uuid}`, { withCredentials: true });
+            setCollection(prevCollection => prevCollection.filter((_, i) => i !== index));
+        } catch (err) {
+            console.log("Error deleting item: ", err);
+        } finally {
+            setLoading(false);
+            setDeleteIndex(null);
+        }
+    };
 
     return (
         <div>
             <Header user={user} />
             <div className="collection-container">
                 <h1 className="subtitle" style={{color: 'black', justifyContent: 'center'}}>{message}</h1>
+                {deleteIndex !== null && (
+                    <div className="blackout-overlay">
+                        <div className="delete-confirmation-dialog">
+                            <h3>Are You Sure You Want to Delete This Wallpaper?</h3>
+                            <hr style={{borderTop: '2px solid white', borderRadius: '5px', margin: '1rem'}}/>
+                            <button onClick={() => deleteItem(deleteIndex)} className="auth-button" style={{marginRight: '30px'}}>{loading ? "Deleting..." : "Yes, Delete Permanently"}</button>
+                            <button onClick={() => setDeleteIndex(null)} className="auth-button">No</button>
+                        </div>
+                    </div>
+                )}
                 {collection.map((item, index) => (
-                    <div id={index} key={index} className="collection-card" onClick={selectImage} style={{ animationDelay: `${index * 0.15}s`, cursor: 'pointer' }}>
-                        <img src={`data:image/png;base64,${item.base64}`} alt={item.location} className="collection-image"/>
+                    <div key={index} className="collection-card" style={{ animationDelay: `${index * 0.15}s`}}>
+                        <img src={`${item.imageURL}`} alt={item.location} className="collection-image"/>
                         <hr style={{borderTop: '2px solid white', borderRadius: '5px', margin: '1rem'}}/>
                         <div style={{display: 'flex', flexDirection: 'row'}}>
-                            <FaDownload style={{margin: '1rem'}}/>
                             <p style={{margin: '1rem'}}>{item.location}</p>
+                            <FaDownload id={index} onClick={selectImage} className="select-content-button"/>
+                            <FaTrash id={index} onClick={() => setDeleteIndex(index)} className="delete-content-button" />
                         </div>
                     </div>
                 ))}

@@ -7,12 +7,12 @@ function Header(props) {
   const [isOpen, setOpen] = useState(false);
 
   return (
-    <div className="header" style={{backgroundColor: props.image ? 'transparent' : '#faf7eb'}}>
-      <Hamburger toggled={isOpen} toggle={setOpen} color={props.image ? '#faf7eb' : '#35BB8B'}/>
-      <nav className={props.image ? "nav-links-image" : "nav-links"}>
-        {isOpen && window.location.pathname !== '/' && window.location.pathname !== '/generated' && 
-          <Link to="/">
-            <strong>Home</strong>
+    <div className="header" style={{backgroundColor: pathname === '/generated'  ? 'transparent' : '#faf7eb'}}>
+      <Hamburger toggled={isOpen} toggle={setOpen} color={pathname === '/generated' ? '#faf7eb' : '#35BB8B'}/>
+      <nav className={pathname === '/generated' ? "nav-links-image" : "nav-links"}>
+        {isOpen && pathname !== '/' && pathname !== '/generated' && 
+          <Link to={imageData ? '/generated' : '/'}>
+            <strong>{imageData ? 'Wallpaper' : 'Home'}</strong>
           </Link>
         }
         {isOpen && window.location.pathname !== '/login' && !props.user &&
