@@ -5,7 +5,8 @@ services:
     user: "1000:1000"
     environment:
       NODE_ENV: production
-      CLIENT_URL: ${CLIENT_URL}
+      PORT: 4000
+      FRONTEND_URL: ${FRONTEND_URL}
       SUPABASE_URL: ${SUPABASE_URL}
       SUPABASE_PUBLISHABLE_KEY: ${SUPABASE_PUBLISHABLE_KEY}
     ports:

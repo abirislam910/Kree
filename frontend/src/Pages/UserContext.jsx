@@ -12,7 +12,7 @@ export function UserProvider({ children }) {
 
   const getUserData = async () => {
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/user`, { withCredentials: true });
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/auth/user`, { withCredentials: true });
           setUser(response.data.user);
         }
           catch (err) {      
@@ -20,18 +20,32 @@ export function UserProvider({ children }) {
         }
     };
 
-  const login = useCallback(async (e, email, password) => {
-    e.preventDefault();
-
+  const register = useCallback(async (email, password, name) => {
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/login`, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, {
+        email: email,
+        password: password,
+        name: name
+      },
+       { withCredentials: true }
+    );
+      console.log("Registration successful");
+    }
+    catch (err) {
+      console.log("Error registering: ", err);
+    }
+  }, []);
+
+  const login = useCallback(async (email, password) => {
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, {
         email: email,
         password: password
       },
        { withCredentials: true }
     );
       console.log("Login successful");
-      setUser(response.data);
+      setUser(response.data.user);
     }
     catch (err) {
       console.log("Error logging in: ", err);
@@ -40,7 +54,7 @@ export function UserProvider({ children }) {
 
   const signout = useCallback(async () => {
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/signout`, {}, { withCredentials: true });
+      await axios.post(`${process.env.REACT_APP_API_URL}/auth/signout`, {}, { withCredentials: true });
       setUser('');
     }
     catch (err) {
@@ -51,8 +65,9 @@ export function UserProvider({ children }) {
   const contextValue = useMemo(() => ({
     user,
     login,
-    signout
-  }), [user, login, signout]);
+    signout, 
+    register
+  }), [user, login, signout, register]);
 
   return (
     <UserContext.Provider value={contextValue}>

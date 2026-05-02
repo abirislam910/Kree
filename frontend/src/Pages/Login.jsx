@@ -18,7 +18,7 @@ function Login() {
     setMessage("");
     setLoading(true);
     try {
-      await login(e, email, password);
+      await login(email, password);
       navigate(redirect.state.from);
     }
     catch (err) {
