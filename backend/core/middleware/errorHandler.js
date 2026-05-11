@@ -1,4 +1,4 @@
 module.exports = function(err, req, res, next) {
-    console.error('Error:', err.message);
-    res.status(500).json({ error: err.message });
-};
+    console.error('Error:', err);
+    res.status(err.statusCode? err.statusCode : 500).json({ error: { message: err.expose ? err.message : 'An unexpected error occurred.' } });
+    };

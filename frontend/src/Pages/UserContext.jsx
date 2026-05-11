@@ -16,13 +16,13 @@ export function UserProvider({ children }) {
           setUser(response.data.user);
         }
           catch (err) {      
-          console.log('Error fetching user data:', err);
-        }
+            console.log('Error fetching user data:', err);
+          }
     };
 
   const register = useCallback(async (email, password, name) => {
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, {
+      await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, {
         email: email,
         password: password,
         name: name

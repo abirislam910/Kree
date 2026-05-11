@@ -1,3 +1,5 @@
+const { InternalServerError, AppError, UnauthorizedError, ExternalAPIError, ConflictError } = require('../../core/errorTypes.js');
+
 async function login (supabase, email, password) {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -6,15 +8,20 @@ async function login (supabase, email, password) {
       })
 
       if (error) {
-        throw new Error('Error logging in: ', error);
+        throw new UnauthorizedError('Error Logging In', { cause: error });
       }
 
       return data.session.user.user_metadata.name;
       
     } catch (err) {
-        throw new Error('Error logging in: ', err);
+        if (err instanceof AppError) {
+          throw err
+        }
+        else {          
+          throw new InternalServerError('Error Logging In', { cause: err }); 
+        }
     }
-};
+  };
 
 async function registration (supabase, email, password, name) {
     try {
@@ -28,11 +35,16 @@ async function registration (supabase, email, password, name) {
         }
       })
       if (error) {
-        throw new Error('Error registering: ', error);
+        throw new ConflictError('Error Registering', { cause: error });
       }
       return data;
-    } catch (error) {
-      throw new Error('Error registering: ', error);
+    } catch (err) {
+      if (err instanceof AppError) {
+        throw err;
+      }
+      else {
+        throw new InternalServerError('Error Registering', { cause: err });
+      }
     }
 };
 
@@ -41,22 +53,36 @@ async function signout (supabase) {
       const { error } = await supabase.auth.signOut()
       
       if (error) {
-        throw new Error('Error signing out: ', error);
+        throw new ExternalAPIError('Error Signing Out', { cause: error });
       }
 
       return;
-    } catch (error) {
-        throw new Error('Error signing out: ', error);
-    } 
+    } catch (err) {
+      if (err instanceof AppError) {
+        throw err;
+      }
+      else {
+        throw new InternalServerError('Error Signing Out', { cause: err });
+      }
+    }
 };
 
 async function getUser (supabase) {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user }, error } = await supabase.auth.getUser()
+
+      if (error && error.status !== 400) {
+        throw new ExternalAPIError('Error Getting User', { cause: error });
+      }
 
       return user? user.user_metadata.name : null;
-    } catch (error) {
-      throw new Error('Error getting user: ', error);
+    } catch (err) {
+      if (err instanceof AppError) {
+        throw err;
+      }
+      else {
+        throw new InternalServerError('Error Getting User', { cause: err });
+      }
     }
 }
 
