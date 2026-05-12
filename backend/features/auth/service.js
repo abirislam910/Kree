@@ -1,4 +1,4 @@
-const { InternalServerError, AppError, UnauthorizedError, ExternalAPIError, ConflictError } = require('../../core/errorTypes.js');
+const { InternalServerError, AppError, UnauthorizedError, ExternalAPIError, ConflictError, ValidationError } = require('../../core/errorTypes.js');
 
 async function login (supabase, email, password) {
     try {
@@ -8,7 +8,7 @@ async function login (supabase, email, password) {
       })
 
       if (error) {
-        throw new UnauthorizedError('Error Logging In', { cause: error });
+        throw new ValidationError('Error Logging In', { cause: error });
       }
 
       return data.session.user.user_metadata.name;
@@ -35,8 +35,9 @@ async function registration (supabase, email, password, name) {
         }
       })
       if (error) {
-        throw new ConflictError('Error Registering', { cause: error });
+        throw new ValidationError('Error Registering', { cause: error });
       }
+      console.log("Registration successful");
       return data;
     } catch (err) {
       if (err instanceof AppError) {

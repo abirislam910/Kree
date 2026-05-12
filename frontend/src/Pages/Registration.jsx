@@ -23,8 +23,7 @@ function Registration() {
       setMessage("Please check your email for a confirmation link");
     }
     catch (err) {
-      setMessage(err);
-      console.log(err);
+      setMessage("Error registering. Please try again.");
     }
 
     setLoading(false);

@@ -17,6 +17,7 @@ export function UserProvider({ children }) {
         }
           catch (err) {      
             console.log('Error fetching user data:', err);
+            throw err;
           }
     };
 
@@ -33,6 +34,7 @@ export function UserProvider({ children }) {
     }
     catch (err) {
       console.log("Error registering: ", err);
+      throw err;
     }
   }, []);
 
@@ -49,6 +51,7 @@ export function UserProvider({ children }) {
     }
     catch (err) {
       console.log("Error logging in: ", err);
+      throw err;
     }
   }, []);
 
@@ -59,6 +62,7 @@ export function UserProvider({ children }) {
     }
     catch (err) {
       console.log(err);
+      throw err;
     }
   }, []);
 

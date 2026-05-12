@@ -8,7 +8,7 @@ class AppError extends Error {
 
 class ValidationError extends AppError {
     constructor(message, options = {}) {
-        super(message, 400, true, options);
+        super(message, 422, true, options);
     }
 }
 

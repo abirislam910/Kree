@@ -26,7 +26,6 @@ function Login() {
       setEmail("");
       setPassword("");
       setLoading(false);
-      console.log(err);
     }
   };
 

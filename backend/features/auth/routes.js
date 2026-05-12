@@ -4,7 +4,7 @@ const { loginController, registrationController, signoutController, getUserContr
 
 router.post('/login', loginController);
 
-router.post('/registration', registrationController);
+router.post('/register', registrationController);
 
 router.post('/signout', signoutController);
 
