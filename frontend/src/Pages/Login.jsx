@@ -22,7 +22,11 @@ function Login() {
       navigate(redirect.state.from);
     }
     catch (err) {
-      setMessage("Error logging in");
+      if (err.status === 422) {
+        setMessage("Invalid email or password");
+      } else {
+        setMessage("Error logging in");
+      }
       setEmail("");
       setPassword("");
       setLoading(false);

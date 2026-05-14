@@ -16,29 +16,27 @@ function Collection() {
 
     useEffect(() => {
         async function getCollection() {
-            const collection = await axios.get(`${process.env.REACT_APP_API_URL}/collection`, { withCredentials: true });
+            const coll = await axios.get(`${process.env.REACT_APP_API_URL}/collection`, { withCredentials: true });
 
-            if (!collection.data || collection.data.length === 0) {
+            if (!coll.data || coll.data.length === 0) {
                 setMessage("No items in collection");
             } else {
                 setMessage("");
-                setCollection(collection.data);
+                setCollection(coll.data.collection);
             }
         };
 
         getCollection();
     }, []);
 
-    const selectImage = async (e) => {
-        const index = e.currentTarget.id;
-        
+    const selectImage = async (index) => {
         const imageData = await axios.get(collection[index].imageURL, { responseType: 'blob' });
         setImageData(imageData.data);
 
         const audioData = await axios.get(collection[index].audioUrl, { responseType: 'arraybuffer' });
         setAudioBuffer(audioData.data);
 
-        navigate('/generated', { state: { location: collection[e.currentTarget.id].location } });
+        navigate('/generated', { state: { location: collection[index].location } });
     }
 
     const deleteItem = async (index) => {
@@ -74,7 +72,7 @@ function Collection() {
                         <hr style={{borderTop: '2px solid white', borderRadius: '5px', margin: '1rem'}}/>
                         <div style={{display: 'flex', flexDirection: 'row'}}>
                             <p style={{margin: '1rem'}}>{item.location}</p>
-                            <FaDownload id={index} onClick={selectImage} className="select-content-button"/>
+                            <FaDownload id={index} onClick={() => selectImage(index)} className="select-content-button"/>
                             <FaTrash id={index} onClick={() => setDeleteIndex(index)} className="delete-content-button" />
                         </div>
                     </div>

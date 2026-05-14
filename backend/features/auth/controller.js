@@ -33,7 +33,7 @@ async function signoutController (req, res, next) {
     } 
 };
 
-async function getUserController (req, res, next) { 
+async function userController (req, res, next) { 
     const supabase = createClient({ req, res });
     try {
       const user = await getUser(supabase);
@@ -47,5 +47,5 @@ module.exports = {
     loginController,
     registrationController,
     signoutController,
-    getUserController
+    userController
 };

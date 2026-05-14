@@ -1,19 +1,13 @@
 const express = require('express');
 const dotenv = require('dotenv');
-
 const app = express();
 dotenv.config();
-
 const axios = require('axios');
-const multer  = require('multer')
-const storage = multer.memoryStorage()
-const upload = multer({ storage: storage })
-const crypto = require('crypto');
 const corsConfig = require('./core/middleware/corsConfig.js');
 const requestLogger = require('./core/middleware/requestLogger.js');
 const cookieParser = require('cookie-parser');
-const { createClient } = require("./core/supabase.js");
 const authRoutes = require('./features/auth/routes.js');
+const collectionRoutes = require('./features/collection/routes.js');
 const errorHandler = require('./core/middleware/errorHandler.js');
 
 app.use(cookieParser());
@@ -22,6 +16,7 @@ app.use(requestLogger);
 app.use(express.json({ limit: '50mb' }));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/collection', collectionRoutes);
 
 app.post('/api/generate/image', async (req, res) => {
     const { prompt } = req.body;
@@ -105,189 +100,6 @@ app.post('/api/generate/music', async (req, res) => {
       console.error("MESSAGE:", error.response?.message);
       console.error("DATA:", error.response?.data);
       res.status(500).json({ message: 'Error generating task: ', error });
-    }
-  });
-
-  app.post('/api/collection', upload.fields([{ name: 'imageData', maxCount: 1 }, { name: 'audioData', maxCount: 1 }]), async (req, res) => { 
-    try {
-      const supabase = createClient({ req, res })
-      const location = req.body.location;
-      const imageData = req.files['imageData'][0].buffer;
-      const audioData = req.files['audioData'][0].buffer;
-
-      console.log("Image Data Received: ", imageData);
-      console.log("Audio Data Received: ", audioData);
-      console.log("Location Received: ", location);
-
-      const { data: { user } } = await supabase.auth.getUser()
-
-      console.log("GetUser called successfully");
-      if (!user) {
-        console.log("User not found");
-        return res.status(404).json({ message: 'User not found' });
-      }
-
-      console.log("User found, proceeding with upload");
-
-      const uuid = crypto.randomUUID();
-
-      const { error: imageError } = await supabase.storage.from('generated_images').upload(`${user.id}/image_${uuid}.png`, imageData, {
-        contentType: 'image/png',
-        cacheControl: '3600',
-      });
-
-      if (imageError) {
-        console.error('Error uploading image: ', imageError);
-        return res.status(500).json({ message: 'Error uploading image: ', imageError });
-      }
-
-      const { error: audioError } = await supabase.storage.from('generated_audio').upload(`${user.id}/audio_${uuid}.mp3`, audioData, {
-        contentType: 'audio/mpeg',
-        cacheControl: '3600',
-      });
-
-      if (audioError) {
-        console.error('Error uploading audio: ', audioError);
-        return res.status(500).json({ message: 'Error uploading audio: ', audioError });
-      }
-
-      console.log("Image and audio uploaded successfully");
-
-      const {error: dBError} = await supabase.from('User_Content').insert({
-        id: uuid,
-        user_id: user.id,
-        location: location,
-        image_path: `${user.id}/image_${uuid}.png`,
-        audio_path: `${user.id}/audio_${uuid}.mp3`,
-      });
-      
-      if (dBError) {
-        console.error('Error inserting into database: ', dBError);
-        return res.status(500).json({ message: 'Error inserting into database: ', dBError });
-      }
-
-      console.log("Database entry created successfully");
-
-      res.sendStatus(200);
-      } catch (err) {
-        console.error('Error uploading image and audio: ', err);
-        res.status(500).json({ message: 'Error uploading image and audio: ', err });
-    }
-  });
-
-  app.get('/api/collection', async (req, res) => { 
-    try {
-      const supabase = createClient({ req, res })
-
-      const { data: { user } } = await supabase.auth.getUser()
-
-      console.log("GetUser called successfully");
-      if (!user) {
-        console.log("User not found");
-        return res.status(404).json({ message: 'User not found' });
-      }
-
-      console.log("User found, proceeding with download");
-
-      const { data: list, error: listError } = await supabase
-        .from('User_Content')
-        .select('id, location, image_path, audio_path')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (listError) {
-        console.error('Error listing images: ', listError);
-      }
-
-      const collection = [];
-
-      for (const item of list) {
-        console.log("Processing item: ", item);
-
-        const { data: imageURL } = supabase
-          .storage
-          .from('generated_images')
-          .getPublicUrl(`${item.image_path}`, {
-          })
-
-        const { data: audioURL } = supabase
-          .storage
-          .from('generated_audio')
-          .getPublicUrl(`${item.audio_path}`, {
-          })
-
-        collection.push({ uuid: item.id, location: item.location, audioUrl: audioURL.publicUrl, imageURL: imageURL.publicUrl });
-      }
-
-      res.status(200).send(collection);
-    } catch (error) {
-      console.error('Error retrieving collection: ', error);
-      res.status(500).json({ message: 'Error retrieving collection: ', error });
-    }
-  });
-
-  app.delete('/api/collection/:id', async (req, res) => {
-    const contentId = req.params.id;
-    try {
-      const supabase = createClient({ req, res })
-
-      const { data: { user } } = await supabase.auth.getUser()
-
-      console.log("GetUser called successfully");
-      if (!user) {
-        console.log("User not found");
-        return res.status(404).json({ message: 'User not found' });
-      }
-
-      console.log("User found, proceeding with deletion");
-
-      const { data, error } = await supabase
-        .from('User_Content')
-        .select('image_path, audio_path')
-        .eq('id', contentId)
-        .eq('user_id', user.id)
-        .single();
-
-      if (error) {
-        console.error('Error retrieving content: ', error);
-        return res.status(500).json({ message: 'Error retrieving content: ', error });
-      }
-
-      if (!data) {
-        console.log("Content not found");
-        return res.status(404).json({ message: 'Content not found' });
-      }
-
-      const { error: imageError } = await supabase.storage.from('generated_images').remove([data.image_path]);
-      const { error: audioError } = await supabase.storage.from('generated_audio').remove([data.audio_path]);
-
-      if (imageError) {
-        console.error('Error deleting image: ', imageError);
-        return res.status(500).json({ message: 'Error deleting image: ', imageError });
-      }
-
-      if (audioError) {
-        console.error('Error deleting audio: ', audioError);
-        return res.status(500).json({ message: 'Error deleting audio: ', audioError });
-      }
-
-      const { error: dbError } = await supabase
-        .from('User_Content')
-        .delete()
-        .eq('id', contentId)
-        .eq('user_id', user.id);
-
-      if (dbError) {
-        console.error('Error deleting database entry: ', dbError);
-        return res.status(500).json({ message: 'Error deleting database entry: ', dbError });
-      }
-
-      console.log("Content deleted successfully");
-
-      res.sendStatus(200);
-    } catch (error) {
-      console.error('Error deleting content: ', error);
-      res.status(500).json({ message: 'Error deleting content: ', error });
     }
   });
 

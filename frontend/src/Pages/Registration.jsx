@@ -23,9 +23,14 @@ function Registration() {
       setMessage("Please check your email for a confirmation link");
     }
     catch (err) {
-      setMessage("Error registering. Please try again.");
+      if (err.status === 400 || err.status === 422) {
+        setMessage("Invalid email or password");
+      } else if (err.status === 429) {
+        setMessage("Too many registration attempts. Please try again later.");
+      } else {
+        setMessage("Error registering. Please try again.");
+      }
     }
-
     setLoading(false);
     setEmail("");
     setPassword("");

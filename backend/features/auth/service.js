@@ -1,4 +1,4 @@
-const { InternalServerError, AppError, UnauthorizedError, ExternalAPIError, ConflictError, ValidationError } = require('../../core/errorTypes.js');
+const { InternalServerError, AppError, TooManyRequestsError, ExternalAPIError, ValidationError } = require('../../core/errorTypes.js');
 
 async function login (supabase, email, password) {
     try {
@@ -12,7 +12,7 @@ async function login (supabase, email, password) {
       }
 
       return data.session.user.user_metadata.name;
-      
+
     } catch (err) {
         if (err instanceof AppError) {
           throw err
@@ -21,7 +21,7 @@ async function login (supabase, email, password) {
           throw new InternalServerError('Error Logging In', { cause: err }); 
         }
     }
-  };
+};
 
 async function registration (supabase, email, password, name) {
     try {
@@ -35,7 +35,16 @@ async function registration (supabase, email, password, name) {
         }
       })
       if (error) {
-        throw new ValidationError('Error Registering', { cause: error });
+        if (error.status === 400 || error.status === 422) {
+          throw new ValidationError('Error Registering', { cause: error });
+        }
+        else if (error.status === 429) {
+          throw new TooManyRequestsError('Too many registration attempts', { cause: error });
+        }
+        else {
+          throw new ExternalAPIError('Error Registering', { cause: error });
+        }
+        
       }
       console.log("Registration successful");
       return data;
@@ -85,11 +94,11 @@ async function getUser (supabase) {
         throw new InternalServerError('Error Getting User', { cause: err });
       }
     }
-}
+};
 
 module.exports = {
     login,
     registration,
     signout,
     getUser
-}
+};
