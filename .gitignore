@@ -12,5 +12,7 @@ frontend/.env.production
 frontend/.env.development
 frontend/.vercel
 
+docs
+
 # misc
 .DS_Store

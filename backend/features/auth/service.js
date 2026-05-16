@@ -1,4 +1,4 @@
-const { InternalServerError, AppError, TooManyRequestsError, ExternalAPIError, ValidationError } = require('../../core/errorTypes.js');
+const { InternalServerError, AppError, TooManyRequestsError, ExternalAPIError, ValidationError, UnauthorizedError } = require('../../core/errorTypes.js');
 
 async function login (supabase, email, password) {
     try {
@@ -8,7 +8,7 @@ async function login (supabase, email, password) {
       })
 
       if (error) {
-        throw new ValidationError('Error Logging In', { cause: error });
+        throw new UnauthorizedError('Error Logging In', { cause: error });
       }
 
       return data.session.user.user_metadata.name;
