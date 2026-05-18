@@ -18,15 +18,18 @@ function Login() {
     setMessage("");
     setLoading(true);
     try {
-      await login(e, email, password);
+      await login(email, password);
       navigate(redirect.state.from);
     }
     catch (err) {
-      setMessage("Error logging in");
+      if (err.status === 422) {
+        setMessage("Invalid email or password");
+      } else {
+        setMessage("Error logging in");
+      }
       setEmail("");
       setPassword("");
       setLoading(false);
-      console.log(err);
     }
   };
 

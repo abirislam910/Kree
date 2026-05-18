@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import { useContext } from "react";
+import { UserContext } from './UserContext.jsx';
+import '../App.css'
 
 function Registration() {
   const [email, setEmail] = useState("");
@@ -8,6 +10,8 @@ function Registration() {
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  
+  const { register } = useContext(UserContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,21 +19,18 @@ function Registration() {
     setLoading(true);
 
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/registration`, {
-        email: email,
-        password: password,
-        name: name
-      },
-       { withCredentials: true }
-    );
-
-    setMessage("Please check your email for a confirmation link");
+      await register(email, password, name);
+      setMessage("Please check your email for a confirmation link");
     }
     catch (err) {
-      setMessage(err);
-      console.log(err);
+      if (err.status === 400 || err.status === 422) {
+        setMessage("Invalid email or password");
+      } else if (err.status === 429) {
+        setMessage("Too many registration attempts. Please try again later.");
+      } else {
+        setMessage("Error registering. Please try again.");
+      }
     }
-
     setLoading(false);
     setEmail("");
     setPassword("");
