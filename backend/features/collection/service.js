@@ -77,20 +77,7 @@ async function collectionGet (supabase) {
 
       for (const item of list) {
         console.log("Processing item: ", item);
-
-        const { data: imageURL } = supabase
-          .storage
-          .from('generated_images')
-          .getPublicUrl(`${item.image_path}`, {
-          })
-
-        const { data: audioURL } = supabase
-          .storage
-          .from('generated_audio')
-          .getPublicUrl(`${item.audio_path}`, {
-          })
-
-        collection.push({ uuid: item.id, location: item.location, audioUrl: audioURL.publicUrl, imageURL: imageURL.publicUrl });
+        collection.push({ uuid: item.id, location: item.location, audioUrl: `${process.env.SUPABASE_URL}/storage/v1/object/public/generated_audio/${item.audio_path}`, imageURL: `${process.env.SUPABASE_URL}/storage/v1/object/public/generated_images/${item.image_path}` });
       }
       return collection;
     } catch (err) {
