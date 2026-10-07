@@ -25,7 +25,7 @@ Authenticated users can save their generated environments to a personal collecti
 
 ## Features
 
-- **AI Image Generation** — Produces a stylized, cozy lo-fi illustration from a user input location using OpenAI's DALL-E 3 model.
+- **AI Image Generation** — Produces a stylized, cozy lo-fi illustration from a user input location using OpenAI's gpt-image-1.5 model.
 - **AI Music Generation** — Generates a lo-fi instrumental based on the described location via the ElevenLabs music API.
 - **User Authentication** — Registration and login via Supabase Auth, with session management handled through secure HTTP cookies.
 - **Saving Generated Content** — Authenticated users can upload generated scenes (image + audio) to cloud storage and browse their saved collection.
@@ -50,7 +50,7 @@ flowchart TB
     end
 
     subgraph External ["External Services"]
-        OAI[OpenAI DALL-E 3]
+        OAI[OpenAI gpt-image-1.5]
         EL[ElevenLabs Music API]
         SPA[Supabase Auth]
         SPS[Supabase Storage]
@@ -71,7 +71,7 @@ sequenceDiagram
     participant U as User
     participant FE as React Frontend
     participant BE as Express Backend
-    participant DALL as OpenAI DALL-E 3
+    participant GPT as OpenAI gpt-image-1.5
     participant EL as ElevenLabs
 
     U->>FE: Enters location description
@@ -79,8 +79,8 @@ sequenceDiagram
     FE->>BE: POST /api/generate-music
     Note over FE: Both requests fire in parallel
 
-    BE->>DALL: POST /v1/images/generations
-    DALL-->>BE: Base64 image data
+    BE->>GPT: POST /v1/images/generations
+    GPT-->>BE: Base64 image data
     BE-->>FE: { imageData }
 
     BE->>EL: POST /v1/music
@@ -148,7 +148,7 @@ sequenceDiagram
 | Backend      | Node.js, Express 4                  |
 | Authentication | Supabase Auth (SSR cookie flow)   |
 | Storage      | Supabase Storage (image + audio buckets) |
-| Image Generation | OpenAI DALL-E 3                |
+| Image Generation | OpenAI gpt-image-1.5                |
 | Music Generation | ElevenLabs Music API            |
 | Containerization | Docker, Docker Compose          |
 | CI/CD        | GitHub Actions, AWS Amplify / Vercel |
@@ -205,7 +205,7 @@ Kree/
 - Node.js >= 18
 - npm
 - A Supabase project with Auth enabled and two storage buckets: `generated_images` and `generated_audio`
-- An OpenAI API key with DALL-E 3 access
+- An OpenAI API key with gpt-image-1.5 access
 - An ElevenLabs API key with music generation access
 
 ### Installation
@@ -262,7 +262,7 @@ docker compose up --build
 |:----------------------------|:-----------------------------------------|
 | `PORT`                      | Server port (default: `4000`)            |
 | `FRONTEND_URL`              | Allowed CORS origin                      |
-| `OPENAI_API_KEY`            | OpenAI API key for DALL-E 3              |
+| `OPENAI_API_KEY`            | OpenAI API key for gpt-image-1.5         |
 | `ELEVEN_API_KEY`            | ElevenLabs API key                       |
 | `SUPABASE_URL`              | Supabase project URL                     |
 | `SUPABASE_PUBLISHABLE_KEY`  | Supabase anon/public key                 |
