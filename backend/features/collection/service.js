@@ -103,7 +103,7 @@ async function collectionDelete (supabase, contentId) {
             .select('image_path, audio_path')
             .eq('id', contentId)
             .eq('user_id', user.id)
-            .single();
+            .maybeSingle();
 
         if (error) {
             throw new ExternalAPIError('Error retrieving content for deletion', { cause: error });
