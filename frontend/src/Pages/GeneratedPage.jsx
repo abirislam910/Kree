@@ -133,6 +133,7 @@ function GeneratedPage() {
     }
     finally {
       setLoading(false);
+      setCollected(false);
       setUploadLock(false);
     }
   };
