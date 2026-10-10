@@ -126,6 +126,9 @@ function GeneratedPage() {
     setError('');
     try {
       await generateContent(location);
+      setCollected(false);
+      setUploadLock(false);
+      setMessage("");
     } 
     catch (err) {
       setError('Error generating content. Please try again.');
@@ -133,8 +136,6 @@ function GeneratedPage() {
     }
     finally {
       setLoading(false);
-      setCollected(false);
-      setUploadLock(false);
     }
   };
 

@@ -69,7 +69,7 @@ async function generateMusic (prompt) {
         {
           "prompt": prompt,
           "model_id": "music_v2_5",
-          "music_length_ms": 30000,
+          "music_length_ms": 60000,
           "force_instrumental": true,
        },
         {
