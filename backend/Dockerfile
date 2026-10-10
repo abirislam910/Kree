@@ -7,6 +7,10 @@ ENV NODE_ENV=production
 
 WORKDIR /usr/src/app
 
+COPY package.json package-lock.json ./
+
+RUN npm ci --omit=dev && npm cache clean --force
+
 COPY . .
 
 EXPOSE 4000
