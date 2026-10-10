@@ -155,6 +155,7 @@ function GeneratedPage() {
   const handleUpload = async () => {
     setUploadLock(true);
     try {
+      setMessage("ing...");
       console.log("Audio Buffer: ", audioBuffer);
       
       var fd = new FormData();
@@ -170,6 +171,8 @@ function GeneratedPage() {
       setMessage(" Successful!");
     } catch (err) {
       console.error('Error uploading:', err);
+      setMessage(" Failed. Try Again!");
+      setUploadLock(false);
     }
   }
 
