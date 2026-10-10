@@ -13,7 +13,7 @@ async function generateImage (prompt) {
           "n": 1,
           "size": "1536x1024",
           "model": "gpt-image-1.5",
-          "quality": "high",
+          "quality": "medium",
           "output_format": "png",
         },
         {
