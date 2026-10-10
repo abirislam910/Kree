@@ -26,7 +26,7 @@ beforeEach(() => {
 });
 
 describe('generateImage', () => {
-    it('requests gpt-image-1.5 and decodes the base64 PNG into a Buffer', async () => {
+    it('requests gpt-image-2.5-sunburst and decodes the base64 PNG into a Buffer', async () => {
         const png = Buffer.from('fake-png-bytes');
         axios.post.mockResolvedValue({ data: { data: [{ b64_json: png.toString('base64') }] } });
 
@@ -39,7 +39,7 @@ describe('generateImage', () => {
         expect(url).toBe('https://api.openai.com/v1/images/generations');
         expect(body).toMatchObject({
             prompt: 'a cozy cabin',
-            model: 'gpt-image-1.5',
+            model: 'gpt-image-2.5-sunburst',
             size: '1536x1024',
             output_format: 'png',
         });
