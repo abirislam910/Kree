@@ -1,12 +1,11 @@
 const { collectionAdd, collectionDelete, collectionGet } = require('./service.js')
+const { validateCollectionUpload } = require('./validators.js');
 const { createClient } = require("../../core/supabase.js");
 
 async function collectionAddController (req, res, next) {
-    const location = req.body.location;
-    const imageData = req.files['imageData'][0].buffer;
-    const audioData = req.files['audioData'][0].buffer;
-    const supabase = createClient({ req, res });
     try {
+      const { imageData, audioData, location } = validateCollectionUpload(req);
+      const supabase = createClient({ req, res });
       await collectionAdd(supabase, imageData, audioData, location);
       res.sendStatus(200);
     } catch (error) {

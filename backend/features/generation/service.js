@@ -11,11 +11,10 @@ async function generateImage (prompt) {
         {
           "prompt": prompt,
           "n": 1,
-          "size": "1792x1024",
-          "model": "dall-e-3",
-          "quality": "hd",
-          "style": "vivid",
-          "response_format": "url",
+          "size": "1536x1024",
+          "model": "gpt-image-1.5",
+          "quality": "high",
+          "output_format": "png",
         },
         {
           headers: {
@@ -25,11 +24,7 @@ async function generateImage (prompt) {
         }
       );
 
-      const imageURL = response.data.data[0].url;
-
-      const imageData = await axios.get(imageURL, { responseType: 'arraybuffer' });
-
-      return Buffer.from(imageData.data);
+      return Buffer.from(response.data.data[0].b64_json, 'base64');
     } catch (error) {
         if (error.response?.status) {
             if (error.response.status === 400) {
@@ -73,6 +68,7 @@ async function generateMusic (prompt) {
         `https://api.elevenlabs.io/v1/music`,
         {
           "prompt": prompt,
+          "model_id": "music_v2_5",
           "music_length_ms": 30000,
           "force_instrumental": true,
        },
