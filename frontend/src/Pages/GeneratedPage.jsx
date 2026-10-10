@@ -28,6 +28,7 @@ function GeneratedPage() {
   const locationData = useLocation();
 
   const [location, setLocation] = useState(locationData.state?.location ? locationData.state.location : '');
+  const [collected, setCollected] = useState(locationData.state?.collected ? locationData.state.collected : false);
 
   const { imageData, audioBuffer, generateContent } = useContext(ContentContext);
 
@@ -148,6 +149,7 @@ function GeneratedPage() {
   };
 
   const handleUpload = async () => {
+    setUploadLock(true);
     try {
       console.log("Audio Buffer: ", audioBuffer);
       
@@ -239,7 +241,7 @@ function GeneratedPage() {
                     <button onClick={handleDownload} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
                       <strong>Download</strong>
                     </button>
-                    {user && (
+                    {user && !collected && (
                       <>
                       <button onClick={handleUpload} disabled={uploadLock} type="button" className="expand-button" style={{ display: isExpanded ? "none" : "block"}}>
                         <strong style={{cursor: uploadLock ? 'not-allowed' : 'pointer'}}>Upload{message}</strong>

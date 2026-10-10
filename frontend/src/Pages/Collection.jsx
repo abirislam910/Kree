@@ -36,7 +36,7 @@ function Collection() {
         const audioData = await axios.get(collection[index].audioUrl, { responseType: 'arraybuffer' });
         setAudioBuffer(audioData.data);
 
-        navigate('/generated', { state: { location: collection[index].location } });
+        navigate('/generated', { state: { location: collection[index].location, collected: true } });
     }
 
     const deleteItem = async (index) => {
