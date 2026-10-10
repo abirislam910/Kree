@@ -59,10 +59,10 @@ function Collection() {
                 {deleteIndex !== null && (
                     <div className="blackout-overlay">
                         <div className="delete-confirmation-dialog">
-                            <h3>Are You Sure You Want to Delete This Wallpaper?</h3>
+                            <h3>Are You Sure You Want to Delete This Background?</h3>
                             <hr style={{borderTop: '2px solid white', borderRadius: '5px', margin: '1rem'}}/>
-                            <button onClick={() => deleteItem(deleteIndex)} className="auth-button" style={{marginRight: '30px'}}>{loading ? "Deleting..." : "Yes, Delete Permanently"}</button>
-                            <button onClick={() => setDeleteIndex(null)} className="auth-button">No</button>
+                            <button onClick={() => deleteItem(deleteIndex)} className="failedsubmit-button" style={{marginRight: '30px'}}>{loading ? "Deleting..." : "Yes, Delete Permanently"}</button>
+                            <button onClick={() => setDeleteIndex(null)} className="failedsubmit-button">No</button>
                         </div>
                     </div>
                 )}
