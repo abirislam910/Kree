@@ -131,7 +131,10 @@ function GeneratedPage() {
       setError('Error generating content. Please try again.');
       console.error(err);
     }
-    setLoading(false);
+    finally {
+      setLoading(false);
+      setUploadLock(false);
+    }
   };
 
   const handleDownload = () => {
