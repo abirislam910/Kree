@@ -66,10 +66,11 @@ function GeneratedPage() {
   });
 
   useEffect(() => {
+      let url = null;
+
       const loadImage = () => {
-        const url = URL.createObjectURL(imageData);
+        url = URL.createObjectURL(imageData);
         setImageURL(url);
-        URL.revokeObjectURL(imageData);
       };
 
       const loadAudio = async () => {
@@ -98,7 +99,7 @@ function GeneratedPage() {
         loadImage();
 
         return () => {
-          URL.revokeObjectURL(imageURL);
+          URL.revokeObjectURL(url);
           if (audioStarted.current) {
             source.current.stop();
             gainNode.current.disconnect();
@@ -135,13 +136,15 @@ function GeneratedPage() {
   const handleDownload = () => {
     if (!imageData) return;
 
+    const url = URL.createObjectURL(imageData);
     const link = document.createElement('a');
-    link.href = `${imageData}`;
+    link.href = url;
     link.download = 'generated-image.png';
 
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   const handleUpload = async () => {
@@ -228,7 +231,7 @@ function GeneratedPage() {
                           </>
                       ) : (
                           <button type="button" onClick={handleButtonClick} className="expand-button">
-                            <strong>Search</strong>
+                            <strong>Prompt</strong>
                           </button>
                       )}
                       </div>
