@@ -6,6 +6,8 @@ Kree allows users to describe any real or imagined location and instantly produc
 
 Authenticated users can save their generated environments to a personal collection and revisit them at any time.
 
+Live deployment: https://kree-app.vercel.app/
+
 ---
 
 ## Table of Contents

@@ -85,7 +85,7 @@ describe('generateImage', () => {
 });
 
 describe('generateMusic', () => {
-    it('requests a 30s instrumental from music_v2_5 and returns the MP3 bytes', async () => {
+    it('requests a 60s instrumental from music_v2_5 and returns the MP3 bytes', async () => {
         const mp3 = Buffer.from('fake-mp3-bytes');
         axios.post.mockResolvedValue({ data: mp3 });
 
@@ -98,7 +98,7 @@ describe('generateMusic', () => {
         expect(body).toEqual({
             prompt: 'lofi beat',
             model_id: 'music_v2_5',
-            music_length_ms: 30000,
+            music_length_ms: 60000,
             force_instrumental: true,
         });
         expect(config.responseType).toBe('arraybuffer');

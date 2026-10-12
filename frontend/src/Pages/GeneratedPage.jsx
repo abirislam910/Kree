@@ -15,7 +15,7 @@ function GeneratedPage() {
   const [imageURL, setImageURL] = useState(null);
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [volume, setVolume] = useState(0.1);
+  const [volume, setVolume] = useState(1);
   const [volumeStore, setVolumeStore] = useState(0);
   const [error, setError] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
@@ -42,7 +42,7 @@ function GeneratedPage() {
 
     const slider = document.getElementById("volume-slider");
 
-    const percent = volume * 1000;
+    const percent = volume * 100;
 
     slider.style.background = `linear-gradient(
       to right,
@@ -261,7 +261,7 @@ function GeneratedPage() {
                     <input
                       type="range"
                       min="0"
-                      max="0.1"
+                      max="1"
                       step="any"
                       value={volume}
                       onChange={handleVolumeChange}
