@@ -5,8 +5,7 @@ import axios from "axios";
 import { FaGear, FaVolumeHigh, FaVolumeXmark } from "react-icons/fa6";
 import '../App.css'
 import { useLocation, useNavigate } from "react-router-dom";
-
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+import { audioContext, unlockAudio } from '../audio.js';
 
 function GeneratedPage() {
   const { user } = useContext(UserContext);
@@ -21,9 +20,7 @@ function GeneratedPage() {
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
 
-  const source = useRef(null);
-  const gainNode = useRef(audioContext.createGain());
-  const audioStarted = useRef(false);
+  const gainNode = useRef(null);
 
   const locationData = useLocation();
 
@@ -33,8 +30,7 @@ function GeneratedPage() {
   const { imageData, audioBuffer, generateContent } = useContext(ContentContext);
 
   useEffect(() => {
-    gainNode.current.connect(audioContext.destination);
-    gainNode.current.gain.setTargetAtTime(
+    gainNode.current?.gain.setTargetAtTime(
       volume,
       audioContext.currentTime,
       0.01
@@ -67,49 +63,56 @@ function GeneratedPage() {
   });
 
   useEffect(() => {
-      let url = null;
+      if (!imageData || !audioBuffer) {
+        navigate('/');
+        return;
+      }
 
-      const loadImage = () => {
-        url = URL.createObjectURL(imageData);
-        setImageURL(url);
-      };
+      // Each run owns its own nodes and URL, so cleanup tears down exactly
+      // what this run created, even if decoding hasn't finished yet.
+      let cancelled = false;
+      let source = null;
 
-      const loadAudio = async () => {
-        if (audioStarted.current) {
-          source.current.stop();
-          gainNode.current.disconnect();
-          source.current = null;
-          gainNode.current = audioContext.createGain();
-        }
-        await audioContext.resume();
+      const gain = audioContext.createGain();
+      gain.gain.value = volume;
+      gain.connect(audioContext.destination);
+      gainNode.current = gain;
+
+      const url = URL.createObjectURL(imageData);
+      setImageURL(url);
+
+      // Don't wait on resume(): in Safari it never settles outside a user
+      // gesture. A source started while suspended plays once audio unlocks.
+      const loadAudio = () => {
+        unlockAudio();
+
         const audioCopy = audioBuffer.slice(0);
         audioContext.decodeAudioData(audioCopy, (decodedData) => {
-          source.current = audioContext.createBufferSource();
-          source.current.buffer = decodedData;
-          source.current.loop = true;
-          gainNode.current.gain.value = volume;
-          source.current.connect(gainNode.current);
-          gainNode.current.connect(audioContext.destination);
-          source.current.start();
-          audioStarted.current = true;
+          if (cancelled) return;
+
+          source = audioContext.createBufferSource();
+          source.buffer = decodedData;
+          source.loop = true;
+          source.connect(gain);
+          source.start();
+        }, (err) => {
+          console.error('Error decoding audio:', err);
         });
       };
-      
-      if (imageData && audioBuffer) {
-        loadAudio(); 
-        loadImage();
 
-        return () => {
-          URL.revokeObjectURL(url);
-          if (audioStarted.current) {
-            source.current.stop();
-            gainNode.current.disconnect();
-          }
-        };
-    }
-    else {
-      navigate('/');
-    }
+      loadAudio();
+
+      return () => {
+        cancelled = true;
+        URL.revokeObjectURL(url);
+        if (source) {
+          source.stop();
+        }
+        gain.disconnect();
+        if (gainNode.current === gain) {
+          gainNode.current = null;
+        }
+      };
   }, [imageData, audioBuffer]);
 
   const handleInputChange = (e) => {
@@ -122,6 +125,7 @@ function GeneratedPage() {
 
   const handleGenerate = async (e) => {
     e.preventDefault();
+    unlockAudio();
     setLoading(true);
     setError('');
     try {

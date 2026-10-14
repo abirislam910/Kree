@@ -3,6 +3,7 @@ import ParallaxLogo from './ParallaxLogo.jsx';
 import { UserContext }  from './UserContext.jsx';
 import { ContentContext } from './ContentContext.jsx';
 import { useNavigate } from "react-router-dom";
+import { unlockAudio } from '../audio.js';
 import '../App.css';
 
 function Home() {
@@ -19,6 +20,7 @@ function Home() {
 
   const handleGenerate = async (e) => {
     e.preventDefault();
+    unlockAudio();
     setError('');
     setLoading(true);
     try {

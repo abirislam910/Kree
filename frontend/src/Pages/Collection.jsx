@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaDownload, FaTrash } from "react-icons/fa6";
 import { ContentContext } from './ContentContext.jsx';
+import { unlockAudio } from '../audio.js';
 import axios from "axios";
 import '../App.css'
 
@@ -30,6 +31,7 @@ function Collection() {
     }, []);
 
     const selectImage = async (index) => {
+        unlockAudio();
         const imageData = await axios.get(collection[index].imageURL, { responseType: 'blob' });
         setImageData(imageData.data);
 
