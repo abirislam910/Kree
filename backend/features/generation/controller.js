@@ -1,4 +1,18 @@
-const { generateImage, generateMusic } = require('./service.js');
+function useMockGeneration () {
+    if (process.env.MOCK_GENERATION !== 'true') {
+        return false;
+    }
+    if (process.env.NODE_ENV === 'production') {
+        console.warn('MOCK_GENERATION is ignored in production');
+        return false;
+    }
+    console.log('MOCK_GENERATION enabled: serving demo image and audio');
+    return true;
+}
+
+const { generateImage, generateMusic } = useMockGeneration()
+    ? require('./mockService.js')
+    : require('./service.js');
 
 async function generateImageController (req, res, next) {
     const { prompt } = req.body;

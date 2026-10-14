@@ -246,6 +246,19 @@ npm start
 # App opens on http://localhost:3000
 ```
 
+### Running Without AI API Calls (Mock Mode)
+
+To work on the app without OpenAI or ElevenLabs keys (or costs), start the backend in mock mode. The generation endpoints then return a bundled demo image and 30-second lo-fi loop from `backend/fixtures/` instead of calling the AI APIs. Auth and collections still use Supabase.
+
+```bash
+cd backend
+npm run dev:mock
+# Optional: simulate generation latency to exercise loading states
+MOCK_GENERATION_DELAY_MS=3000 npm run dev:mock
+```
+
+Mock mode is ignored when `NODE_ENV=production`. To regenerate the demo files, see `backend/scripts/make_fixtures.py`.
+
 ### Running with Docker
 
 ```bash
