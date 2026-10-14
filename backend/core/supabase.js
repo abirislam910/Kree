@@ -14,7 +14,9 @@ exports.createClient = (context) => {
           const cookies = cookiesToSet.map(({ name, value, options }) =>
             serializeCookieHeader(name, value, {
               ...options,
-              sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+              // The frontend proxies /api through its own domain, so the auth
+              // cookie is first-party and Lax works in every browser.
+              sameSite: 'lax',
               secure: true,
               path: "/"
             })
