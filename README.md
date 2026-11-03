@@ -147,7 +147,7 @@ sequenceDiagram
 | Layer        | Technology                          |
 |:-------------|:------------------------------------|
 | Frontend     | React 18, React Router, styled-components |
-| Backend      | Node.js, Express 4                  |
+| Backend      | Node.js, Express 4, TypeScript (strict) |
 | Authentication | Supabase Auth (SSR cookie flow)   |
 | Storage      | Supabase Storage (image + audio buckets) |
 | Image Generation | OpenAI gpt-image-1.5                |
@@ -163,10 +163,18 @@ sequenceDiagram
 ```
 Kree/
 ├── backend/
-│   ├── server.js            # Express API — all route handlers
-│   ├── lib/
-│   │   └── supabase.js      # Supabase SSR client factory
-│   ├── Dockerfile           # Production Docker image (Node 22 Alpine)
+│   ├── src/
+│   │   ├── server.ts        # Entry point
+│   │   ├── app.ts           # Express app — middleware and route mounting
+│   │   ├── core/            # Errors, env, Supabase client factory, middleware
+│   │   ├── features/        # auth, collection, generation — routes/controller/service/validators
+│   │   └── lib/
+│   │       └── types.ts     # Shared types (database schema, API payloads)
+│   ├── tests/               # Jest + Supertest (unit and integration)
+│   ├── fixtures/            # Demo image/audio for mock mode
+│   ├── tsconfig.json        # Strict type-checking for src + tests
+│   ├── tsconfig.build.json  # Compiles src → dist
+│   ├── Dockerfile           # Multi-stage production image (Node 22 Alpine)
 │   ├── compose.yaml         # Docker Compose service definition
 │   ├── package.json
 │
@@ -193,7 +201,7 @@ Kree/
 │
 ├── .github/
 │   └── workflows/
-│       └── backend-test.yml # CI — Docker build verification on push/PR
+│       └── backend-test.yml # CI — type-check, tests, compile, Docker build on push/PR
 │
 └── .gitignore
 ```
@@ -233,9 +241,18 @@ npm install
 ```bash
 cd backend
 # Create a .env file (see Environment Variables below)
-npm start
-# Server starts on http://localhost:4000
+npm run dev
+# Server starts on http://localhost:4000 and restarts on changes
 ```
+
+Other backend scripts:
+
+| Script              | What it does                                   |
+|:--------------------|:-----------------------------------------------|
+| `npm test`          | Run the Jest test suite                        |
+| `npm run typecheck` | Type-check `src/` and `tests/` (strict mode)   |
+| `npm run build`     | Compile `src/` to `dist/`                      |
+| `npm start`         | Run the compiled server from `dist/`           |
 
 **Frontend:**
 
